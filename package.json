@@ -1,9 +1,9 @@
 {
-  "name": "organic-webcell",
+  "name": "organic-angel",
   "version": "0.0.0",
   "main": "Angel.js",
   "bin": {
-    "angel": "./bin/angel"
+    "angel": "./bin/angel.js"
   },
   "scripts": {
     "test": "jasmine-node ./tests/"
@@ -11,7 +11,8 @@
   "dependencies": {
     "organic": "0.0.5",
     "glob": "*",
-    "shelljs": "*"
+    "shelljs": "*",
+    "temporary": "*"
   },
   "devDependencies": {
     "jasmine-node": "latest"

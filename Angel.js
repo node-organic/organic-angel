@@ -16,13 +16,27 @@ module.exports = organic.Cell.extend(function Angel(dna){
     self.plasma.emit("ready");
   }
 }, {
-  populate: function(target, template, data, callback){
+  populateLocal: function(target, template, data, callback){
     if(typeof data == "function") {
       callback = data;
-      data = {
-        name: path.basename(target,path.extname(target))
-      }
+      data = undefined;
     }
-    this.plasma.emit({type: "populate", target: target, template: template, data: data}, callback);
+    this.plasma.emit({
+      type: "PopulateLocal", 
+      target: target, 
+      template: template, 
+      data: data}, callback);
+  },
+  populateRemote: function(remote, target, template, data, callback) {
+    if(typeof data == "function") {
+      callback = data;
+      data = undefined;
+    }
+    this.plasma.emit({
+      type: "PopulateRemote", 
+      remote: remote, 
+      target: target, 
+      template: template, 
+      data: data}, callback);
   }
 })
