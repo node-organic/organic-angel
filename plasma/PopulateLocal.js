@@ -9,7 +9,7 @@ module.exports = organic.Organel.extend(function PopulateLocal(plasma, config){
   this.on("PopulateLocal", this.populate)
 }, {
   populate: function(c, sender, callback){
-    if(c.template.indexOf("://") != -1) {
+    if(c.template.indexOf("://") != -1 || c.template.indexOf(".git") != -1) {
       var tempDir = new TempDir;
       var cmd = "git clone "+c.template+" "+tempDir.path;
       var result = shelljs.exec(cmd);
