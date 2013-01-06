@@ -1,0 +1,20 @@
+{
+  "name": "organic-webcell",
+  "version": "0.0.0",
+  "main": "Angel.js",
+  "bin": {
+    "angel": "./bin/angel"
+  },
+  "scripts": {
+    "test": "jasmine-node ./tests/"
+  },
+  "dependencies": {
+    "organic": "0.0.5",
+    "glob": "*",
+    "shelljs": "*"
+  },
+  "devDependencies": {
+    "jasmine-node": "latest"
+  },
+  "license": "MIT"
+}
