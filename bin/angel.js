@@ -41,10 +41,14 @@ instance.plasma.on("Angel", function(){
     })
   }
 
+  if(process.argv[2] == "upgrade") {
+    process.kill(process.argv[3], "SIGUSR1");
+    console.log("upgraded"); // how to get the new pid fast ?
+  }
 
   if(process.argv[2] == "restart") {
     process.kill(process.argv[3], "SIGUSR2");
-    console.log("restarted");
+    console.log("restarted"); // how to get the new pid fast ?
   }
 
   if(process.argv[2] == "list") {
