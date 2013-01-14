@@ -7,14 +7,18 @@ describe("when using Angel class", function(){
 
   it("creates an instance", function(next){
     instance = new Angel();
-    instance.plasma.on("ready", function(c){
+    instance.plasma.on("Angel", function(c){
       expect(c instanceof Error).toBeFalsy();
       next();
     });
   });
 
   it("populates directory with git template", function(next){
-    instance.populateLocal(__dirname+"/target", "git://github.com/outbounder/php5boilerplate.git", function(c){
+    instance.plasma.emit({
+      type: "PopulateLocal",
+      target: __dirname+"/target", 
+      template: "git://github.com/outbounder/php5boilerplate.git"
+    }, this, function(c){
       expect(c instanceof Error).toBeFalsy();
       expect(fs.existsSync(__dirname+"/target/index.php")).toBe(true);
       shelljs.rm('-fr', __dirname+"/target");

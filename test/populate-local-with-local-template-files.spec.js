@@ -7,14 +7,18 @@ describe("when using Angel class", function(){
 
   it("creates an instance", function(next){
     instance = new Angel();
-    instance.plasma.on("ready", function(c){
+    instance.plasma.on("Angel", function(c){
       expect(c instanceof Error).toBeFalsy();
       next();
     });
   });
 
   it("populates directory with local template files", function(next){
-    instance.populateLocal(__dirname+"/target", __dirname+"/data/nodejs-template", function(c){
+    instance.plasma.emit({
+      type: "PopulateLocal",
+      target: __dirname+"/target", 
+      template: __dirname+"/data/nodejs-template"
+    }, function(c){
       expect(c instanceof Error).toBeFalsy();
       var packagejson = JSON.parse(fs.readFileSync(__dirname+"/target/package.json").toString());
       expect(packagejson.name).toBe("target");
@@ -28,8 +32,13 @@ describe("when using Angel class", function(){
   });
 
   it("populates directory with local template files and preseeded data", function(next){
-    instance.populateLocal(__dirname+"/target", __dirname+"/data/nodejs-template", {
-      name: "TestTarget"
+    instance.plasma.emit({
+      type: "PopulateLocal",
+      target: __dirname+"/target", 
+      template: __dirname+"/data/nodejs-template", 
+      data: {
+        name: "TestTarget"
+      }
     },function(c){
       expect(c instanceof Error).toBeFalsy();
       var packagejson = JSON.parse(fs.readFileSync(__dirname+"/target/package.json").toString());
