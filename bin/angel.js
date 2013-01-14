@@ -43,13 +43,8 @@ instance.plasma.on("Angel", function(){
 
 
   if(process.argv[2] == "restart") {
-    instance.plasma.emit({
-      type: "Tissue",
-      action: "restart",
-      target: process.argv[3]
-    }, this, function(c){
-      console.log("restarted ", util.inspect(c));
-    })
+    process.kill(process.argv[3], "SIGUSR2");
+    console.log("restarted");
   }
 
   if(process.argv[2] == "list") {
