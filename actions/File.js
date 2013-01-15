@@ -15,9 +15,9 @@ var printContentsUntilEnd = function(fd, result, callback) {
   })
 }
 
-module.exports = organic.Organel.extend(function LocalFile(plasma, config){
+module.exports = organic.Organel.extend(function File(plasma, config){
   organic.Organel.call(this, plasma, config);
-  this.on("LocalFile", function(c, sender, callback){
+  this.on("File", function(c, sender, callback){
     this[c.action](c, sender, callback);
   });
 }, {
