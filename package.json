@@ -9,11 +9,11 @@
     "test": "jasmine-node ./tests/"
   },
   "dependencies": {
-    "organic": "0.0.6",
+    "organic": "0.0.7",
     "glob": "*",
     "shelljs": "*",
     "temporary": "*",
-    "organic-cells": "*"
+    "organic-cells": "0.0.4"
   },
   "devDependencies": {
     "jasmine-node": "latest"
