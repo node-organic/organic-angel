@@ -10,7 +10,8 @@ instance.plasma.on("Angel", function(){
   if(remote.indexOf("@") === -1) {
     actionGroup = remote;
     remote = null;
-  }
+  } else
+    actionGroup = argv.shift();
   var action = argv.shift();
 
   var chemical = {};
