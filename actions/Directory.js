@@ -25,10 +25,10 @@ module.exports = organic.Organel.extend(function Directory(plasma, config){
           return callback(new Error("failed to mkdir -p on remote "+c.remote));
         if(c.target.lastIndexOf("/") !== c.target.length-1)
           c.target += "/";
-        var result = shelljs.exec("scp -r "+c.target+"* "+c.remote+":"+remoteTarget);
+        var result = shelljs.exec("scp -r "+localPopulate.target+"* "+c.remote+":"+remoteTarget);
         if(result.code != 0)
           return callback(new Error("failed to scp -r on remote "+c.remote));
-        shelljs.rm('-rf', c.target);
+        shelljs.rm('-rf', localPopulate.target);
         callback(r);
       });
     } else

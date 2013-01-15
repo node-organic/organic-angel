@@ -3,6 +3,7 @@ var util = require("util");
 var Angel = require("../Angel");
 var instance = new Angel();
 var shelljs = require("shelljs");
+var util = require('util');
 
 instance.plasma.on("Angel", function(){
   var argv = process.argv.splice(2);
@@ -18,50 +19,10 @@ instance.plasma.on("Angel", function(){
   chemical.type = actionGroup;
   chemical.action = action;
   chemical.remote = remote;
+  chemical.target = argv.shift();
 
   if(chemical.type == "Directory" && chemical.action == "populate") {
-    chemical.target = argv.shift();
     chemical.template = argv.shift();
-  }
-
-  if(chemical.type == "File" && chemical.action == "watch") {
-    chemical.target = argv.shift();
-  }
-
-  if(chemical.type == "Tissue" && chemical.action == "start") {
-    chemical.target = argv.shift();
-    chemical.cwd = argv.shift();
-  }
-
-  if(chemical.type == "Tissue" && chemical.action == "stop") {
-    chemical.target = argv.shift();
-  }
-
-  if(chemical.type == "Tissue" && chemical.action == "list") {
-    chemical.target = argv.shift();
-  }
-
-  if(chemical.type == "Cell" && chemical.action == "install") {
-    chemical.target = argv.shift();
-    chemical.source = argv.shift();
-  }
-
-  if(chemical.type == "Cell" && chemical.action == "upgrade") {
-    chemical.target = argv.shift();
-    chemical.live = argv.shift();
-  }
-
-  if(chemical.type == "Cell" && chemical.action == "restart") {
-    chemical.target = argv.shift();
-  }
-
-  if(chemical.type == "Cell" && chemical.action == "start") {
-    chemical.target = argv.shift();
-    chemical.cwd = argv.shift();
-  }
-
-  if(chemical.type == "Cell" && chemical.action == "stop") {
-    chemical.target = argv.shift();
   }
 
   if(chemical.type == "RemoteAngel" && chemical.action == "invoke") {
@@ -69,7 +30,8 @@ instance.plasma.on("Angel", function(){
   }
 
   instance.plasma.emit(chemical, instance, function(c){
-    console.log('done ', c.data);
-  })
+    if(c.code)
+      process.exit(c.code);
+  });
   
 });

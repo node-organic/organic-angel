@@ -15,7 +15,8 @@ describe("when using Angel class", function(){
 
   it("populates directory with git template", function(next){
     instance.plasma.emit({
-      type: "PopulateLocal",
+      type: "Directory",
+      action: "populate",
       target: __dirname+"/target", 
       template: "git://github.com/outbounder/php5boilerplate.git"
     }, this, function(c){

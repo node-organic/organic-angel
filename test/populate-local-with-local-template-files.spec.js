@@ -15,7 +15,8 @@ describe("when using Angel class", function(){
 
   it("populates directory with local template files", function(next){
     instance.plasma.emit({
-      type: "PopulateLocal",
+      type: "Directory",
+      action: "populate",
       target: __dirname+"/target", 
       template: __dirname+"/data/nodejs-template"
     }, function(c){

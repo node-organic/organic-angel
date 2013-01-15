@@ -1,0 +1,18 @@
+{
+  "remote-siblings": [
+    {
+      "name": "staging",
+      "remote": "node@176.58.101.229",
+      "target": "~/testCell",
+      "main": "testCell.js",
+      "source": "https://github.com/outbounder/organic-angel.git"
+    },
+    {
+      "name": "production",
+      "remote": "node@176.58.101.229",
+      "target": "~/testCell-prod",
+      "main": "testCell.js",
+      "source": "https://github.com/outbounder/organic-angel.git"
+    }
+  ]
+}
