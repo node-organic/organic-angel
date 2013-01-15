@@ -69,9 +69,8 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
   "start":  function(c, sender, callback){
     if(c.remote) {
       var cmd = ". ~/.nvm/nvm.sh; nvm use "+process.version+"; "+
-        "cd "+path.dirname(c.target)+"; git pull; "+
-        "npm install; "+
-        "angel Tissue start "+c.target+" "+c.cwd;
+        "cd "+(c.cwd || path.dirname(c.target))+"; "+
+        "angel Tissue start "+c.target;
       var child = shelljs.exec("ssh "+c.remote+' "'+cmd+'"', {async: true});
       child.on('exit', function(code){
         if(callback) callback({data: code});
