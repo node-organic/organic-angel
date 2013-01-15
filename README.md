@@ -5,23 +5,32 @@ Single cell and command line application for doing handy of helpful things for e
 
 * can populate local or remote directory using a template source
 * supports file based & git based template sources
+* can start/stop processes in background
+* can list running organic processes who form Tissues (see `organic-cells`)
+* can restart and/or upgrade organic processes who has Self (see `organic-cells`)
 
 ## Command line usage ##
 
-  $ angel populate <targetDir> <templateSource>
-
+    $ angel populate <targetDir> <templateSource>
 Will fill up `targetDir` with the contents of `templateSource` by replacing any occurances of `%name%` within file names or file contents. `%name%` is a variable holding the directory name of `targetDir`.
 
-  $ angel remote populate <user@host> <targetDir> <templateSource>
+    $ angel remote populate <user@host> <targetDir> <templateSource>
+The same as local populate method, but end result is uploaded to `user@host` using `scp`
 
-The same as local populate method, but end result is uploaded to `user@host` using scp.
+    $ angel start <app.js>
+Will start app.js, output and error log files wull be stored at `cwd`\<app.js>.out and `cwd`\<app.js>.err
+    
+    $ angel list 
+Will list any processes using Tissue's algorithm (see `organic-cells`)
 
-## API usage ##
+    $ angel stop <pid>
+Will stop any process with given pid
 
-  var Angel = require("Angel");
-  var instance = new Angel();
-  instance.populateLocal(target, templateSource, data, callback);
-  instance.populateRemote(remote, target, templateSource, data, callback);
+    $ angel restart <pid>
+Will send `SIGUSR2` to process with given pid (see `organic-cells`)
+
+    $ angel upgrade <pid>
+Will send `SIGUSR1` to process with given pid (see `organic-cells`)
 
 ## Examples, tips & tricks ##
 
