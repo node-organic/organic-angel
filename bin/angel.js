@@ -18,11 +18,6 @@ instance.plasma.on("Angel", function(){
   chemical.action = action;
   chemical.remote = remote;
 
-  if(chemical.type == "Cell" && chemical.action == "install") {
-    chemical.target = argv.shift();
-    chemical.source = argv.shift();
-  }
-
   if(chemical.type == "Directory" && chemical.action == "populate") {
     chemical.target = argv.shift();
     chemical.template = argv.shift();
@@ -34,10 +29,20 @@ instance.plasma.on("Angel", function(){
 
   if(chemical.type == "Tissue" && chemical.action == "start") {
     chemical.target = argv.shift();
+    chemical.cwd = argv.shift();
   }
 
   if(chemical.type == "Tissue" && chemical.action == "stop") {
     chemical.target = argv.shift();
+  }
+
+  if(chemical.type == "Tissue" && chemical.action == "list") {
+    chemical.target = argv.shift();
+  }
+
+  if(chemical.type == "Cell" && chemical.action == "install") {
+    chemical.target = argv.shift();
+    chemical.source = argv.shift();
   }
 
   if(chemical.type == "Cell" && chemical.action == "upgrade") {
@@ -54,7 +59,7 @@ instance.plasma.on("Angel", function(){
     chemical.cwd = argv.shift();
   }
 
-  if(chemical.type == "Tissue" && chemical.action == "list") {
+  if(chemical.type == "Cell" && chemical.action == "stop") {
     chemical.target = argv.shift();
   }
 

@@ -30,14 +30,8 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
   },
   "upgrade": function(c, sender, callback){
     if(c.remote) {
-      var cmd;
-      if(c.live)
-        cmd = ". ~/.nvm/nvm.sh; nvm use "+process.version+"; "+
-          "angel Cell upgrade "+c.target;
-      else
-        cmd = ". ~/.nvm/nvm.sh; nvm use "+process.version+"; "+
-          "cd "+c.target+"; git pull; "+
-          "npm install; "
+      var cmd = ". ~/.nvm/nvm.sh; nvm use "+process.version+"; "+
+        "angel Cell upgrade "+c.target;
       var child = shelljs.exec("ssh "+c.remote+' "'+cmd+'"', {async: true});
       child.on('exit', function(code){
         if(callback) callback({data: code});
@@ -49,14 +43,8 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
   },
   "restart": function(c, sender, callback){
     if(c.remote) {
-      var cmd;
-      if(c.live)
-        cmd = ". ~/.nvm/nvm.sh; nvm use "+process.version+"; "+
-          "angel Cell restart "+c.target;
-      else
-        cmd = ". ~/.nvm/nvm.sh; nvm use "+process.version+"; "+
-          "cd "+c.target+"; git pull; "+
-          "npm install; "
+      var cmd = ". ~/.nvm/nvm.sh; nvm use "+process.version+"; "+
+        "angel Cell restart "+c.target;
       var child = shelljs.exec("ssh "+c.remote+' "'+cmd+'"', {async: true});
       child.on('exit', function(code){
         if(callback) callback({data: code});
@@ -70,7 +58,7 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
     if(c.remote) {
       var cmd = ". ~/.nvm/nvm.sh; nvm use "+process.version+"; "+
         "cd "+(c.cwd || path.dirname(c.target))+"; "+
-        "angel Tissue start "+c.target;
+        "angel Cell start "+c.target+" "+c.cwd;
       var child = shelljs.exec("ssh "+c.remote+' "'+cmd+'"', {async: true});
       child.on('exit', function(code){
         if(callback) callback({data: code});
@@ -81,6 +69,23 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
         action: "start",
         target: c.target,
         cwd: c.cwd
+      }, callback);
+    }
+  },
+  "stop":  function(c, sender, callback){
+    if(c.remote) {
+      var cmd = ". ~/.nvm/nvm.sh; nvm use "+process.version+"; "+
+        "cd "+(c.cwd || path.dirname(c.target))+"; "+
+        "angel Cell stop "+c.target;
+      var child = shelljs.exec("ssh "+c.remote+' "'+cmd+'"', {async: true});
+      child.on('exit', function(code){
+        if(callback) callback({data: code});
+      });
+    } else {
+      this.emit({
+        type: "Tissue",
+        action: "stop",
+        target: c.target
       }, callback);
     }
   }
