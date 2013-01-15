@@ -48,6 +48,10 @@ instance.plasma.on("Angel", function(){
   if(chemical.type == "Cell" && chemical.action == "restart") {
     chemical.target = argv.shift();
   }
+  
+  if(chemical.type == "Cell" && chemical.action == "start") {
+    chemical.target = argv.shift();
+  }
 
   if(chemical.type == "Tissue" && chemical.action == "list") {
     chemical.target = argv.shift();
