@@ -42,6 +42,7 @@ instance.plasma.on("Angel", function(){
 
   if(chemical.type == "Cell" && chemical.action == "upgrade") {
     chemical.target = argv.shift();
+    chemical.live = argv.shift();
   }
 
   if(chemical.type == "Cell" && chemical.action == "restart") {
