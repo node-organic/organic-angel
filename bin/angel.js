@@ -16,6 +16,8 @@ instance.plasma.on("Angel", function(){
   instance.plasma.emit(chemical, instance, function(c){
     if(c.code)
       process.exit(c.code);
+    else
+      console.log(util.inspect(c));
   });
   
 });

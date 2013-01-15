@@ -21,7 +21,7 @@ var getRemoteSibling = function(target, callback){
 var sshExec = function(remote, instructions, callback) {
   var cmd = "ssh "+remote+' "'+instructions.join(";")+'"';
   shelljs.exec(cmd, function(code, output){
-    if(callback) callback(c);  
+    if(callback) callback({code: code, output: output});  
   });
 }
 
