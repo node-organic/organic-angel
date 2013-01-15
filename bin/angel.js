@@ -7,10 +7,10 @@ var shelljs = require("shelljs");
 instance.plasma.on("Angel", function(){
   var argv = process.argv.splice(2);
   var remote = argv.shift();
-  if(remote.indexOf("@") === -1)
+  if(remote.indexOf("@") === -1) {
     actionGroup = remote;
-  else
-    actionGroup = argv.shift();
+    remote = null;
+  }
   var action = argv.shift();
 
   var chemical = {};
