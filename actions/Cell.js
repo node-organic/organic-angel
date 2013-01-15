@@ -7,7 +7,7 @@ var path = require("path");
 var getRemoteSibling = function(target, callback){
   var dna = new DNA();
   dna.loadDir(process.cwd()+"/dna", function(){
-    var mode = process.env.CELL_MODE || "development";
+    var mode = process.env.CELL_MODE || "development"; // XXX
     if(dna[mode])
       dna.mergeBranchInRoot(mode);
     var remoteSiblings = dna.cell['remote-siblings'];
@@ -21,7 +21,7 @@ var getRemoteSibling = function(target, callback){
 var sshExec = function(remote, instructions, callback) {
   var cmd = "ssh "+remote+' "'+instructions.join(";")+'"';
   shelljs.exec(cmd, function(code, output){
-    if(callback) callback({code: code, output: output});  
+    if(callback) callback(c);  
   });
 }
 
