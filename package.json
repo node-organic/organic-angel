@@ -13,7 +13,7 @@
     "glob": "*",
     "shelljs": "*",
     "temporary": "*",
-    "organic-cells": "0.0.4"
+    "organic-cells": "0.0.5"
   },
   "devDependencies": {
     "jasmine-node": "latest"
