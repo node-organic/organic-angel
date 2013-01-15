@@ -48,7 +48,7 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
     }
   },
   "restart": function(c, sender, callback){
-    f(c.remote) {
+    if(c.remote) {
       var cmd;
       if(c.live)
         cmd = ". ~/.nvm/nvm.sh; nvm use "+process.version+"; "+
