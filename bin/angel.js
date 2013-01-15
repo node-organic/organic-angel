@@ -2,7 +2,38 @@
 var util = require("util");
 var Angel = require("../Angel");
 var instance = new Angel();
+var shelljs = require("shelljs");
+
 instance.plasma.on("Angel", function(){
+  if(process.argv[2].indexOf("@") !== -1) {
+    // assuming that this is remote in format user@server
+    // TODO get nvm resolver?
+    var cmd = "ssh "+process.argv[2]+' ". ~/.nvm/nvm.sh; nvm use '+process.version+';angel '+
+      process.argv.slice(3).join(" ")+'"';
+    var child = shelljs.exec(cmd, {async:true})
+    child.stdout.on('data', console.log);
+    child.stderr.on('data', console.log);
+    child.on('exit', function(code){
+      console.log('done with code ', code);
+    });
+    return;
+  }
+
+  if(process.argv[2] == "cell") {
+    var chemical = {};
+    chemical.type = "Cell";
+    if(process.argv[3].indexOf("@") === -1) {
+      chemical.target = process.argv[3];
+      chemical.source = process.argv[4];
+    } else {
+      chemical.remote = process.argv[3];
+      chemical.target = process.argv[4];
+      chemical.source = process.argv[5];
+    }
+    instance.plasma.emit(chemical, this, function(c){ // continiusly emitted
+      console.log("done", util.inspect(c));
+    });
+  }
 
   if(process.argv[2] == "populate") {
     var chemical = {}

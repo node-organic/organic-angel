@@ -9,7 +9,7 @@ var printContentsUntilEnd = function(fd, result, callback) {
       result += buffer.toString('utf-8', 0, bytesRead);
       printContentsUntilEnd(fd, result, callback);
     } else {
-      result += "--- " + new Date() + "---";
+      result += "--- " + new Date() + " ---";
       callback(result);
     }
   })
