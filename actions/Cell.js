@@ -23,6 +23,7 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
     } else {
       var dna = new DNA();
       dna.loadDir(process.cwd()+"/dna", function(){
+        if(!dna.cell) return callback();
         var remoteSiblings = dna.cell['remote-siblings'];
         for(var i = 0; i<remoteSiblings.length; i++)
           if(remoteSiblings[i].name == target) 
