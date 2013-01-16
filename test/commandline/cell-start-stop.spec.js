@@ -17,6 +17,12 @@ describe("command line angel", function(){
       next();
     });
   })
+  it("cell status", function(next){
+    shelljs.exec("angel Cell status staging", function(code, output){
+      expect(code).toBe(0);
+      next();
+    });
+  })
   it("cell stops", function(next){
     shelljs.exec("angel Cell stop staging", function(code, output){
       expect(code).toBe(0);
