@@ -31,6 +31,6 @@ module.exports = organic.Cell.extend(function Angel(dna){
     });
   } else {
     organic.Cell.call(this, dna);
-    self.plasma.emit("Angel");
+    this.plasma.emit("Angel");
   }
 })
