@@ -4,6 +4,7 @@ var Angel = require("../Angel");
 var instance = new Angel();
 var shelljs = require("shelljs");
 var util = require('util');
+var EventEmitter = require('events').EventEmitter;
 
 instance.plasma.on("Angel", function(){
   var argv = process.argv.splice(2);
@@ -17,7 +18,11 @@ instance.plasma.on("Angel", function(){
     if(c.code)
       process.exit(c.code);
     else
-      console.log(util.inspect(c));
+      console.log(JSON.stringify(c, function(key, value){
+        if(typeof value == "object" && value instanceof EventEmitter && value.pid)
+          return {pid: value.pid};
+        return value;
+      }));
   });
   
 });

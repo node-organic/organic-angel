@@ -72,9 +72,7 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
           type: "Tissue",
           action: "start",
           target: c.target
-        }, function(r){
-          if(callback) callback(r);
-        })
+        }, callback)
       }
     })
   },
@@ -93,9 +91,7 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
           type: "Tissue",
           action: "stopall", 
           target: c.target
-        }, function(r){
-          if(callback) callback(r);
-        });
+        }, callback);
       }
     })
   },
@@ -114,7 +110,7 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
           type: "Tissue",
           action: "start",
           target: c.target
-        })
+        }, callback)
       }
     })
   },
