@@ -102,23 +102,46 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
   "restart": function(c, sender, callback){
     var self = this;
     this.getRemoteSibling(c.target, function(s){
-      self.sshExec(s.remote, [
-        "cd "+s.target,
-        ". ~/.nvm/nvm.sh",
-        "nvm use "+process.version,
-        "angel Tissue restartall "+s.main
-      ], callback);
+      if(s) {
+        self.sshExec(s.remote, [
+          "cd "+s.target,
+          ". ~/.nvm/nvm.sh",
+          "nvm use "+process.version,
+          "angel Tissue restartall "+s.main
+        ], callback);
+      } else {
+        self.emit({
+          type: "Tissue",
+          action: "start",
+          target: c.target
+        })
+      }
     })
   },
   "upgrade": function(c, sender, callback){
     var self = this;
     this.getRemoteSibling(c.target, function(s){
-      self.sshExec(s.remote, [
-        "cd "+s.target,
-        ". ~/.nvm/nvm.sh",
-        "nvm use "+process.version,
-        "angel Tissue upgradeall "+s.main
-      ], callback);
+      if(s) {
+        self.sshExec(s.remote, [
+          "cd "+s.target,
+          ". ~/.nvm/nvm.sh",
+          "nvm use "+process.version,
+          "angel Tissue upgradeall "+s.main
+        ], callback);
+      } else {
+        self.emit({
+          type: "Tissue",
+          action: "list"
+        }, function(r){
+          var alive = [];
+          r.data.forEach(function(entry){
+            if(entry.name == c.target) {
+              process.kill(-entry.pid, "SIGUSR1");
+            }
+          });
+          if(callback) callback({data: alive});
+        })
+      }
     })
   },
   "status": function(c, sender, callback){
@@ -132,11 +155,11 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
           "angel Cell status "+s.main
         ], callback);
       } else {
-        var alive = [];
         self.emit({
           type: "Tissue",
           action: "list"
         }, function(r){
+          var alive = [];
           r.data.forEach(function(entry){
             if(entry.name == c.target || entry.tissue == c.target) {
               alive.push(entry);
