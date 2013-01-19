@@ -89,9 +89,17 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
       } else {
         self.emit({
           type: "Tissue",
-          action: "stopall", 
-          target: c.target
-        }, callback);
+          action: "list"
+        }, function(r){
+          var stopped = [];
+          r.data.forEach(function(entry){
+            if(entry.name == c.target) {
+              process.kill(-entry.pid);
+              stopped.push(entry);
+            }
+          });
+          if(callback) callback({data: stopped});
+        })
       }
     })
   },
@@ -108,9 +116,17 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
       } else {
         self.emit({
           type: "Tissue",
-          action: "start",
-          target: c.target
-        }, callback)
+          action: "list"
+        }, function(r){
+          var alive = [];
+          r.data.forEach(function(entry){
+            if(entry.name == c.target) {
+              process.kill(-entry.pid, "SIGUSR2");
+              alive.push(entry);
+            }
+          });
+          if(callback) callback({data: alive});
+        })
       }
     })
   },
@@ -133,6 +149,7 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
           r.data.forEach(function(entry){
             if(entry.name == c.target) {
               process.kill(-entry.pid, "SIGUSR1");
+              alive.push(entry);
             }
           });
           if(callback) callback({data: alive});
