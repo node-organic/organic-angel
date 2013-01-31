@@ -11,6 +11,7 @@
   "dependencies": {
     "organic": "0.0.8",
     "organic-cells": "0.0.6",
+    "servicer": "*",
     "glob": "*",
     "shelljs": "*",
     "temporary": "*"
