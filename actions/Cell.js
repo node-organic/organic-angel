@@ -94,7 +94,7 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
           var stopped = [];
           r.data.forEach(function(entry){
             if(entry.name == c.target) {
-              process.kill(-entry.pid);
+              process.kill(entry.pid);
               stopped.push(entry);
             }
           });
@@ -121,7 +121,7 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
           var alive = [];
           r.data.forEach(function(entry){
             if(entry.name == c.target) {
-              process.kill(-entry.pid, "SIGUSR2");
+              process.kill(entry.pid, "SIGUSR2");
               alive.push(entry);
             }
           });
@@ -148,7 +148,7 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
           var alive = [];
           r.data.forEach(function(entry){
             if(entry.name == c.target) {
-              process.kill(-entry.pid, "SIGUSR1");
+              process.kill(entry.pid, "SIGUSR1");
               alive.push(entry);
             }
           });
