@@ -9,12 +9,12 @@
     "test": "jasmine-node ./tests/"
   },
   "dependencies": {
-    "organic": "0.0.8",
-    "organic-cells": "0.0.8",
-    "servicer": "*",
-    "glob": "*",
-    "shelljs": "*",
-    "temporary": "*"
+    "organic": "0.0.9",
+    "organic-cells": "0.0.9",
+    "servicer": "0.0.1",
+    "glob": "3.1.14",
+    "shelljs": "0.1.1",
+    "temporary": "0.0.5"
   },
   "devDependencies": {
     "jasmine-node": "latest"
