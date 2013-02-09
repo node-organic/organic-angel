@@ -10,9 +10,9 @@ module.exports = organic.Cell.extend(function Angel(dna){
   if(!dna) {
     var self = this;
     dna = new organic.DNA();
-    dna.mapDirectoryToBranch("plasma", __dirname+"/actions", function(){
+    dna.mapDirectoryToBranch("plasma", path.join(__dirname, "actions"), function(){
       dna.createBranch("membrane.Tissue", {
-        source: __dirname+"/node_modules/organic-cells/membrane/Tissue",
+        source: path.join(__dirname,"/node_modules/organic-cells/membrane/Tissue"),
         bindTo: "angels"
       });
       fs.exists(angelDNAPath, function(exists){
