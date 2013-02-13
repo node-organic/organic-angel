@@ -2,7 +2,7 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 25000;
 
 var shelljs = require("shelljs");
 
-describe("command line angel", function(){
+xdescribe("command line angel", function(){
   shelljs.cd(__dirname+"/../data/testCell/");
 
   it("cell registers", function(next){

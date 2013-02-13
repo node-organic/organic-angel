@@ -1,6 +1,6 @@
 {
   "name": "organic-angel",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "main": "Angel.js",
   "bin": {
     "angel": "./bin/angel.js"
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "organic": "0.0.10",
-    "organic-cells": "0.0.9",
+    "organic-cells": "0.0.10",
     "servicer": "0.0.1",
     "glob": "3.1.14",
     "shelljs": "0.1.1",
