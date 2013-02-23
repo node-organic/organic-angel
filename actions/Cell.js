@@ -225,19 +225,22 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
           "cd "+s.target,
           s.npmSourceCmd || ". ~/.nvm/nvm.sh",
           s.nvmUseVersion || "nvm use "+process.version,
-          "angel Cell show-output "+s.main
+          "angel Cell output "+s.main
         ], callback);
       } else {
-        var outputFile = c.target+".out";
-        if(fs.existsSync(outputFile))
-          self.printLast(outputFile);
-        else
-          console.log(outputFile+" not found");
         var errorFile = c.target+".err";
-        if(fs.existsSync(errorFile))
+        if(fs.existsSync(errorFile)) {
+          console.log(errorFile);
           self.printLast(errorFile);
-        else
+        } else
           console.log(errorFile+" not found");
+
+        var outputFile = c.target+".out";
+        if(fs.existsSync(outputFile)) {
+          console.log(outputFile);
+          self.printLast(outputFile);
+        } else
+          console.log(outputFile+" not found");
       }
     })
   },
@@ -249,19 +252,22 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
           "cd "+s.target,
           s.npmSourceCmd || ". ~/.nvm/nvm.sh",
           s.nvmUseVersion || "nvm use "+process.version,
-          "angel Cell watch-output "+s.main
+          "angel Cell watch "+s.main
         ], callback);
       } else {
-        var outputFile = c.target+".out";
-        if(fs.existsSync(outputFile))
-          self.printAndWatch(outputFile);
-        else
-          console.log(outputFile+" not found");
         var errorFile = c.target+".err";
-        if(fs.existsSync(errorFile))
+        if(fs.existsSync(errorFile)) {
+          console.log(errorFile);
           self.printAndWatch(errorFile);
-        else
+        } else
           console.log(errorFile+" not found");
+          
+        var outputFile = c.target+".out";
+        if(fs.existsSync(outputFile)) {
+          console.log(outputFile);
+          self.printAndWatch(outputFile);
+        } else
+          console.log(outputFile+" not found");
       }
     })
   }
