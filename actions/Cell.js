@@ -3,6 +3,7 @@ var DNA = organic.DNA;
 var glob = require("glob");
 var shelljs = require("shelljs");
 var path = require("path");
+var fs = require('fs');
 
 module.exports = organic.Organel.extend(function Cell(plasma, config){
   organic.Organel.call(this, plasma, config);
@@ -186,14 +187,17 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
   "printLast": function(f, callback){
     fs.stat(f, function(err, stats){
       if (err) throw err;
-      var readStream = fs.createReadStream(f, {
-        start: stats.size>1024?stats.size-1024:0,
-        end: stats.size
-      }).addListener("data", function(lines) {
-        console.log(lines.toString());
-        readStream.destroy();
+      if(stats.size > 0)
+        var readStream = fs.createReadStream(f, {
+          start: stats.size>1024?stats.size-1024:0,
+          end: stats.size
+        }).addListener("data", function(lines) {
+          console.log(lines.toString());
+          readStream.destroy();
+          if(callback) callback(stats.size);
+        });
+      else
         if(callback) callback(stats.size);
-      });
     });
   },
   "printAndWatch": function(f){
@@ -201,18 +205,19 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
       fs.watchFile(f, function (curr, prev) {
         fs.stat(f, function(err, stats){
           if (err) throw err;
-          fs.createReadStream(f, {
-            start: startByte,
-            end: stats.size
-          }).addListener("data", function(lines) {
-            console.log(lines.toString());
-            startByte = stats.size;
-          });
+          if(stats.size > 0)
+            fs.createReadStream(f, {
+              start: startByte,
+              end: stats.size
+            }).addListener("data", function(lines) {
+              console.log(lines.toString());
+              startByte = stats.size;
+            });
         });
       });
     })
   },
-  "show-output": function(c, sender, callback){
+  "output": function(c, sender, callback){
     var self = this;
     this.getRemoteSibling(c.target, function(s){
       if(s) {
@@ -225,13 +230,18 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
       } else {
         var outputFile = c.target+".out";
         if(fs.existsSync(outputFile))
-          this.printLast(outputFile);
+          self.printLast(outputFile);
         else
           console.log(outputFile+" not found");
+        var errorFile = c.target+".err";
+        if(fs.existsSync(errorFile))
+          self.printLast(errorFile);
+        else
+          console.log(errorFile+" not found");
       }
     })
   },
-  "watch-output": function(c, sender, callback){
+  "watch": function(c, sender, callback){
     var self = this;
     this.getRemoteSibling(c.target, function(s){
       if(s) {
@@ -244,45 +254,12 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
       } else {
         var outputFile = c.target+".out";
         if(fs.existsSync(outputFile))
-          this.printAndWatch(outputFile);
+          self.printAndWatch(outputFile);
         else
           console.log(outputFile+" not found");
-      }
-    })
-  },
-  "show-error": function(c, sender, callback){
-    var self = this;
-    this.getRemoteSibling(c.target, function(s){
-      if(s) {
-        self.sshExec(s.remote, [
-          "cd "+s.target,
-          s.npmSourceCmd || ". ~/.nvm/nvm.sh",
-          s.nvmUseVersion || "nvm use "+process.version,
-          "angel Cell show-error "+s.main
-        ], callback);
-      } else {
         var errorFile = c.target+".err";
         if(fs.existsSync(errorFile))
-          this.printLast(errorFile);
-        else
-          console.log(errorFile+" not found");
-      }
-    })
-  },
-  "watch-error": function(c, sender, callback){
-    var self = this;
-    this.getRemoteSibling(c.target, function(s){
-      if(s) {
-        self.sshExec(s.remote, [
-          "cd "+s.target,
-          s.npmSourceCmd || ". ~/.nvm/nvm.sh",
-          s.nvmUseVersion || "nvm use "+process.version,
-          "angel Cell watch-error "+s.main
-        ], callback);
-      } else {
-        var errorFile = c.target+".err";
-        if(fs.existsSync(errorFile))
-          this.printAndWatch(errorFile);
+          self.printAndWatch(errorFile);
         else
           console.log(errorFile+" not found");
       }
