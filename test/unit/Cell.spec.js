@@ -5,7 +5,13 @@ describe("Cell Organelle", function(){
   var config = {
     cell: {
       "remote-siblings": [
-        { name: "1", target: "~/dir", remote: "test@server", source: "git@github", main: "test.js" }
+        { 
+          name: "1", 
+          target: "~/dir", 
+          remote: "test@server", 
+          source: "git@github", 
+          main: "test.js" 
+        }
       ]
     }
   };

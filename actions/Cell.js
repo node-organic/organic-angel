@@ -45,8 +45,8 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
         "mkdir -p "+s.target,
         "cd "+s.target,
         "git clone "+s.source+" .",
-        ". ~/.nvm/nvm.sh",
-        "nvm use "+process.version,
+        s.npmSourceCmd || ". ~/.nvm/nvm.sh",
+        s.nvmUseVersion || "nvm use "+process.version,
         "npm install"
       ], callback);
     });
@@ -63,8 +63,8 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
       if(s) {
         self.sshExec(s.remote, [
           "cd "+s.target,
-          ". ~/.nvm/nvm.sh",
-          "nvm use "+process.version,
+          s.npmSourceCmd || ". ~/.nvm/nvm.sh",
+          s.nvmUseVersion || "nvm use "+process.version,
           "angel Tissue start "+s.main
         ], callback);
       } else {
@@ -82,8 +82,8 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
       if(s){
         self.sshExec(s.remote, [
           "cd "+s.target,
-          ". ~/.nvm/nvm.sh",
-          "nvm use "+process.version,
+          s.npmSourceCmd || ". ~/.nvm/nvm.sh",
+          s.nvmUseVersion || "nvm use "+process.version,
           "angel Tissue stopall "+s.main
         ], callback);
       } else {
@@ -109,8 +109,8 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
       if(s) {
         self.sshExec(s.remote, [
           "cd "+s.target,
-          ". ~/.nvm/nvm.sh",
-          "nvm use "+process.version,
+          s.npmSourceCmd || ". ~/.nvm/nvm.sh",
+          s.nvmUseVersion || "nvm use "+process.version,
           "angel Tissue restartall "+s.main
         ], callback);
       } else {
@@ -136,8 +136,8 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
       if(s) {
         self.sshExec(s.remote, [
           "cd "+s.target,
-          ". ~/.nvm/nvm.sh",
-          "nvm use "+process.version,
+          s.npmSourceCmd || ". ~/.nvm/nvm.sh",
+          s.nvmUseVersion || "nvm use "+process.version,
           "angel Tissue upgradeall "+s.main
         ], callback);
       } else {
@@ -163,8 +163,8 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
       if(s) {
         self.sshExec(s.remote, [
           "cd "+s.target,
-          ". ~/.nvm/nvm.sh",
-          "nvm use "+process.version,
+          s.npmSourceCmd || ". ~/.nvm/nvm.sh",
+          s.nvmUseVersion || "nvm use "+process.version,
           "angel Cell status "+s.main
         ], callback);
       } else {
@@ -180,6 +180,111 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
           });
           if(callback) callback({data: alive});
         })
+      }
+    })
+  },
+  "printLast": function(f, callback){
+    fs.stat(f, function(err, stats){
+      if (err) throw err;
+      var readStream = fs.createReadStream(f, {
+        start: stats.size>1024?stats.size-1024:0,
+        end: stats.size
+      }).addListener("data", function(lines) {
+        console.log(lines.toString());
+        readStream.destroy();
+        if(callback) callback(stats.size);
+      });
+    });
+  },
+  "printAndWatch": function(f){
+    this.printLast(f, function(startByte){
+      fs.watchFile(f, function (curr, prev) {
+        fs.stat(f, function(err, stats){
+          if (err) throw err;
+          fs.createReadStream(f, {
+            start: startByte,
+            end: stats.size
+          }).addListener("data", function(lines) {
+            console.log(lines.toString());
+            startByte = stats.size;
+          });
+        });
+      });
+    })
+  },
+  "show-output": function(c, sender, callback){
+    var self = this;
+    this.getRemoteSibling(c.target, function(s){
+      if(s) {
+        self.sshExec(s.remote, [
+          "cd "+s.target,
+          s.npmSourceCmd || ". ~/.nvm/nvm.sh",
+          s.nvmUseVersion || "nvm use "+process.version,
+          "angel Cell show-output "+s.main
+        ], callback);
+      } else {
+        var outputFile = c.target+".out";
+        if(fs.existsSync(outputFile))
+          this.printLast(outputFile);
+        else
+          console.log(outputFile+" not found");
+      }
+    })
+  },
+  "watch-output": function(c, sender, callback){
+    var self = this;
+    this.getRemoteSibling(c.target, function(s){
+      if(s) {
+        self.sshExec(s.remote, [
+          "cd "+s.target,
+          s.npmSourceCmd || ". ~/.nvm/nvm.sh",
+          s.nvmUseVersion || "nvm use "+process.version,
+          "angel Cell watch-output "+s.main
+        ], callback);
+      } else {
+        var outputFile = c.target+".out";
+        if(fs.existsSync(outputFile))
+          this.printAndWatch(outputFile);
+        else
+          console.log(outputFile+" not found");
+      }
+    })
+  },
+  "show-error": function(c, sender, callback){
+    var self = this;
+    this.getRemoteSibling(c.target, function(s){
+      if(s) {
+        self.sshExec(s.remote, [
+          "cd "+s.target,
+          s.npmSourceCmd || ". ~/.nvm/nvm.sh",
+          s.nvmUseVersion || "nvm use "+process.version,
+          "angel Cell show-error "+s.main
+        ], callback);
+      } else {
+        var errorFile = c.target+".err";
+        if(fs.existsSync(errorFile))
+          this.printLast(errorFile);
+        else
+          console.log(errorFile+" not found");
+      }
+    })
+  },
+  "watch-error": function(c, sender, callback){
+    var self = this;
+    this.getRemoteSibling(c.target, function(s){
+      if(s) {
+        self.sshExec(s.remote, [
+          "cd "+s.target,
+          s.npmSourceCmd || ". ~/.nvm/nvm.sh",
+          s.nvmUseVersion || "nvm use "+process.version,
+          "angel Cell watch-error "+s.main
+        ], callback);
+      } else {
+        var errorFile = c.target+".err";
+        if(fs.existsSync(errorFile))
+          this.printAndWatch(errorFile);
+        else
+          console.log(errorFile+" not found");
       }
     })
   }
