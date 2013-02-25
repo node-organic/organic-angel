@@ -107,4 +107,14 @@ describe("Cell Organelle", function(){
       next();
     })
   })
+  it("output remote", function(next){
+    var s = config.cell["remote-siblings"][0];
+    cell.sshExec = mockSshExec(0, "");
+    cell.output({ target: s.name }, this, function(c){
+      expect(c.code).toBe(0);
+      expect(c.insturctions[3]).toContain("angel Cell output ");
+      expect(c.insturctions[3]).toContain(s.main);
+      next();
+    })
+  })
 })

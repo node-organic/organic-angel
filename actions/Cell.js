@@ -4,6 +4,7 @@ var glob = require("glob");
 var shelljs = require("shelljs");
 var path = require("path");
 var fs = require('fs');
+var async = require('async');
 
 module.exports = organic.Organel.extend(function Cell(plasma, config){
   organic.Organel.call(this, plasma, config);
@@ -184,38 +185,20 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
       }
     })
   },
-  "printLast": function(f, callback){
-    fs.stat(f, function(err, stats){
-      if (err) throw err;
+  "printFile": function(c, sender, callback){
+    fs.stat(c.target, function(err, stats){
+      if (err) return callback(err);
       if(stats.size > 0)
-        var readStream = fs.createReadStream(f, {
-          start: stats.size>1024?stats.size-1024:0,
+        var readStream = fs.createReadStream(c.target, {
+          start: 0,
           end: stats.size
         }).addListener("data", function(lines) {
-          console.log(lines.toString());
           readStream.destroy();
-          if(callback) callback(stats.size);
+          if(callback) callback({data: lines.toString(), size: stats.size});
         });
       else
-        if(callback) callback(stats.size);
+        if(callback) callback({data: "", size: 0});
     });
-  },
-  "printAndWatch": function(f){
-    this.printLast(f, function(startByte){
-      fs.watchFile(f, function (curr, prev) {
-        fs.stat(f, function(err, stats){
-          if (err) throw err;
-          if(stats.size > 0)
-            fs.createReadStream(f, {
-              start: startByte,
-              end: stats.size
-            }).addListener("data", function(lines) {
-              console.log(lines.toString());
-              startByte = stats.size;
-            });
-        });
-      });
-    })
   },
   "output": function(c, sender, callback){
     var self = this;
@@ -229,19 +212,40 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
         ], callback);
       } else {
         var errorFile = c.target+".err";
-        if(fs.existsSync(errorFile)) {
-          console.log(errorFile);
-          self.printLast(errorFile);
-        } else
-          console.log(errorFile+" not found");
-
         var outputFile = c.target+".out";
-        if(fs.existsSync(outputFile)) {
-          console.log(outputFile);
-          self.printLast(outputFile);
-        } else
-          console.log(outputFile+" not found");
+        async.map([errorFile, outputFile], function(file, next){
+          self.printFile({target: file}, self, function(c){
+            if(c instanceof Error)
+              next(c)
+            else
+              next(null, "file "+file+" >>>\n"+c.data+"\n<<< "+file+"\n");
+          });
+        }, function(err, results){
+          if(err) return callback(err);
+          if(callback) callback({data: results.join("\n")});
+        })
       }
+    })
+  },
+  "watchFile": function(c, sender, callback){
+    var startByte = 0;
+    fs.stat(c.target, function(r){
+      startByte = r.size || 0;
+      fs.watchFile(c.target, function (curr, prev) {
+        fs.stat(c.target, function(err, stats){
+          if (err) return callback(err);
+          if(stats.size > 0) {
+            var readStream = fs.createReadStream(c.target, {
+              start: startByte,
+              end: stats.size
+            }).addListener("data", function(lines) {
+              startByte = stats.size;
+              readStream.destroy();
+              if(callback) callback({data: lines.toString(), size: stats.size});
+            });
+          }
+        });
+      });
     })
   },
   "watch": function(c, sender, callback){
@@ -256,18 +260,12 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
         ], callback);
       } else {
         var errorFile = c.target+".err";
-        if(fs.existsSync(errorFile)) {
-          console.log(errorFile);
-          self.printAndWatch(errorFile);
-        } else
-          console.log(errorFile+" not found");
-          
         var outputFile = c.target+".out";
-        if(fs.existsSync(outputFile)) {
-          console.log(outputFile);
-          self.printAndWatch(outputFile);
-        } else
-          console.log(outputFile+" not found");
+        [errorFile, outputFile].forEach(function(file){
+          self.watchFile({target: file}, self, function(c){
+            if(callback) callback(c);
+          });
+        });
       }
     })
   }

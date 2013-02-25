@@ -14,10 +14,12 @@
     "servicer": "0.0.1",
     "glob": "3.1.14",
     "shelljs": "0.1.1",
-    "temporary": "0.0.5"
+    "temporary": "0.0.5",
+    "async": "*"
   },
   "devDependencies": {
-    "jasmine-node": "latest"
+    "jasmine-node": "latest",
+    "organic-webcell": "0.2.2"
   },
   "license": "MIT"
 }
