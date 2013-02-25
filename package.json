@@ -1,6 +1,6 @@
 {
   "name": "organic-angel",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "main": "Angel.js",
   "bin": {
     "angel": "./bin/angel.js"
