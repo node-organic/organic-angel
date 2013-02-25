@@ -6,6 +6,14 @@ var shelljs = require("shelljs");
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 
+var toJSON = function(c){
+  return JSON.stringify(c, function(key, value){
+    if(typeof value == "object" && value instanceof EventEmitter && value.pid)
+      return {pid: value.pid};
+    return value;
+  })
+}
+
 instance.plasma.on("Angel", function(){
   var argv = process.argv.splice(2);
 
@@ -15,14 +23,18 @@ instance.plasma.on("Angel", function(){
   chemical.target = argv.shift();
 
   instance.plasma.emit(chemical, instance, function(c){
-    if(c.code)
+    if(c.code) {
+      console.log(toJSON(c))
       process.exit(c.code);
-    else
-      console.log(JSON.stringify(c, function(key, value){
-        if(typeof value == "object" && value instanceof EventEmitter && value.pid)
-          return {pid: value.pid};
-        return value;
-      }));
+    } if(c.data){
+      if(typeof c.data == "string" && c.data.indexOf("\n") !== -1)
+        console.log(c.data);
+      else
+        console.log(toJSON(c.data));
+    } else {
+      console.log(toJSON(c));
+    }
+      
   });
   
 });

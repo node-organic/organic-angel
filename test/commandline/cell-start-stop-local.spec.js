@@ -28,7 +28,7 @@ describe("command line angel", function(){
       expect(code).toBe(0);
       expect(fs.existsSync(target+"testCell.js.out")).toBe(true);
       expect(fs.existsSync(target+"testCell.js.err")).toBe(true);
-      expect(JSON.parse(output).data.pid).not.toBe(beforeRestart.data.pid);
+      expect(JSON.parse(output).pid).not.toBe(beforeRestart.pid);
       next();
     });
   })
