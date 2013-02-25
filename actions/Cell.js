@@ -36,9 +36,16 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
   },
   sshExec : function(remote, instructions, callback) {
     var cmd = "ssh "+remote+' "'+instructions.join(";")+'"';
-    shelljs.exec(cmd, function(code, output){
-      if(callback) callback({code: code, output: output});  
-    });
+    var child = shelljs.exec(cmd,{async: true, silent: true});
+    child.stdout.on("data", function(d){
+      if(callback) callback({output: d.toString()});  
+    })
+    child.stderr.on("data", function(d){
+      if(callback) callback({output: d.toString()});  
+    })
+    child.on("exit", function(code, signal){
+      if(callback) callback({code: code, signal: signal});  
+    })
   },
   "install": function(c, sender, callback){
     var self = this;
@@ -188,16 +195,19 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
   "printFile": function(c, sender, callback){
     fs.stat(c.target, function(err, stats){
       if (err) return callback(err);
-      if(stats.size > 0)
+      if(stats.size > 0) {
+        var buffer = "";
         var readStream = fs.createReadStream(c.target, {
           start: 0,
           end: stats.size
         }).addListener("data", function(lines) {
+          buffer += lines.toString();
+        }).addListener("end", function(){
           readStream.destroy();
-          if(callback) callback({data: lines.toString(), size: stats.size});
-        });
-      else
-        if(callback) callback({data: "", size: 0});
+          if(callback) callback({data: buffer});
+        })
+      } else
+        if(callback) callback({data: ""});
     });
   },
   "output": function(c, sender, callback){
@@ -229,8 +239,9 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
   },
   "watchFile": function(c, sender, callback){
     var startByte = 0;
-    fs.stat(c.target, function(r){
-      startByte = r.size || 0;
+    fs.stat(c.target, function(err, r){
+      if(r && r.size)
+        startByte = r.size;
       fs.watchFile(c.target, function (curr, prev) {
         fs.stat(c.target, function(err, stats){
           if (err) return callback(err);
@@ -239,10 +250,11 @@ module.exports = organic.Organel.extend(function Cell(plasma, config){
               start: startByte,
               end: stats.size
             }).addListener("data", function(lines) {
+              if(callback) callback({data: lines.toString()});
+            }).addListener("end", function(){
               startByte = stats.size;
               readStream.destroy();
-              if(callback) callback({data: lines.toString(), size: stats.size});
-            });
+            })
           }
         });
       });

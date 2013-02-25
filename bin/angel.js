@@ -24,11 +24,17 @@ instance.plasma.on("Angel", function(){
 
   instance.plasma.emit(chemical, instance, function(c){
     if(c.code) {
-      console.log(toJSON(c))
       process.exit(c.code);
-    } if(c.data){
-      if(typeof c.data == "string" && c.data.indexOf("\n") !== -1)
-        console.log(c.data);
+    } else
+    if(c.output) {
+      if(typeof c.output == "string")
+        process.stdout.write(c.output);
+      else
+        console.log(toJSON(c));
+    } else
+    if(c.data) {
+      if(typeof c.data == "string")
+        process.stdout.write(c.data);
       else
         console.log(toJSON(c.data));
     } else {

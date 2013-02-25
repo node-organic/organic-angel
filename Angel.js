@@ -18,11 +18,13 @@ module.exports = organic.Cell.extend(function Angel(dna){
       fs.exists(angelDNAPath, function(exists){
         if(!exists) {
           organic.Cell.call(self, dna);
+          self.plasma.emit("surviveExceptions");
           self.plasma.emit("Angel");
         } else {
           dna.loadFile(angelDNAPath, "angel", function(){
             dna.mergeBranchInRoot("angel");
             organic.Cell.call(self, dna);
+            self.plasma.emit("surviveExceptions");
             self.plasma.emit("Angel");
           })
         }
