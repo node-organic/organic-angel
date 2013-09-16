@@ -1,4 +1,4 @@
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 25000;
+jasmine.getEnv().defaultTimeoutInterval = 25000;
 
 var shelljs = require("shelljs");
 

@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "organic": "0.0.10",
-    "organic-cells": "0.0.14",
+    "organic-cells": "0.0.17",
     "servicer": "0.0.1",
     "glob": "3.1.14",
     "shelljs": "0.1.1",
@@ -18,7 +18,7 @@
     "async": "*"
   },
   "devDependencies": {
-    "jasmine-node": "latest",
+    "jasmine-node": "1.11.0",
     "organic-webcell": "0.2.2"
   },
   "license": "MIT"
