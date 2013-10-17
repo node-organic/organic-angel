@@ -2,6 +2,13 @@
   "plasma": {
     "TestOrganelle": {
       "source": "scripts/TestOrganelle"
+    },
+    "upgrade": {
+      "commands": [
+        "git pull",
+        "npm install --production",
+        "node build.js"
+      ]
     }
   }
 }
