@@ -13,5 +13,14 @@
   },
   "uninstall": {
     "source": "commands/uninstall"
+  },
+  "stop": {
+    "source": "commands/stop"
+  },
+  "restart": {
+    "source": "commands/restart"
+  },
+  "upgrade": {
+    "source": "commands/upgrade"
   }
 }

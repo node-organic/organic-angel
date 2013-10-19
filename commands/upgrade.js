@@ -5,7 +5,7 @@ module.exports = function(plasma, config){
       "cd "+c.cell.cwd,
       c.cell.nvmSource || ". ~/.nvm/nvm.sh",
       c.cell.nodeVersion || "nvm use "+process.version,
-      "git pull"+(c.cell.branch?" "+c.cell.branch:""),
+      "git pull origin "+c.cell.branch,
       "npm install"
     ]
 

@@ -3,7 +3,8 @@
     "remote": "node@176.58.101.229",
     "cwd": "~/testCell",
     "target": "test/data/testCell/testCell.js",
-    "source": "https://github.com/outbounder/organic-angel.git"
+    "source": "https://github.com/outbounder/organic-angel.git",
+    "branch": "v0.2"
   },
   "demoversion": {
     "remote": "node@176.58.101.229",
