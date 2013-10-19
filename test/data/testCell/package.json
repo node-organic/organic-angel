@@ -4,6 +4,6 @@
     "url": "https://github.com/outbounder/organic-angel.git"
   },
   "dependencies": {
-
+    "organic-angel": "https://github.com/outbounder/organic-angel/archive/v0.2.tar.gz"
   }
 }
