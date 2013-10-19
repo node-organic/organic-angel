@@ -8,7 +8,7 @@ module.exports = function(plasma) {
       c.cell = dna.cell
       if(c.cell[name]) {
         c.cell = c.cell[name]
-        next && next(c)
+        next && next()
       } else
         next && next(new Error(name+" cell not found in dna/cell"))
     });

@@ -11,8 +11,8 @@
   "install": {
     "source": "commands/install"
   },
-  "uninstall": {
-    "source": "commands/uninstall"
+  "remove": {
+    "source": "commands/remove"
   },
   "stop": {
     "source": "commands/stop"
@@ -22,5 +22,8 @@
   },
   "upgrade": {
     "source": "commands/upgrade"
+  },
+  "status": {
+    "source": "commands/status"
   }
 }
