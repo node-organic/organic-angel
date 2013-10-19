@@ -1,7 +1,8 @@
 # Angel #
 
-    $ angel cell on staging install
-    $ angel cell on production start
-    $ angel cell on srv1 upgrade
-    $ angel cell on srv2 stop
-    $ angel cell test restart
+    $ angel cell staging install
+    $ angel cell staging start
+    $ angel cell staging Tissue -action cleanup
+    $ angel cell staging exec "ps aux | grep node"
+    $ angel Tissue -action cleanup
+    $ angel Tissue -action start -target index.js

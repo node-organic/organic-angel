@@ -1,2 +1,3 @@
-var Cell = require("organic-webcell/WebCell");
-var instance = new Cell();
+require("http").createServer(function(req, res){
+  res.end("hello")
+}).listen()

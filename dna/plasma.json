@@ -1,5 +1,17 @@
 {
-  "CommandReactor": {
-    "source": "node_modules/organic-commandreactor"
+  "react": {
+    "source": "commands/react"
+  },
+  "cell": {
+    "source": "commands/cell"
+  },
+  "start": {
+    "source": "commands/start"
+  },
+  "install": {
+    "source": "commands/install"
+  },
+  "uninstall": {
+    "source": "commands/uninstall"
   }
 }

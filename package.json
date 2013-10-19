@@ -17,8 +17,7 @@
     "async": "*"
   },
   "devDependencies": {
-    "jasmine-node": "1.11.0",
-    "organic-webcell": "0.2.2"
+    "jasmine-node": "1.11.0"
   },
   "license": "MIT"
 }
