@@ -23,7 +23,7 @@ module.exports = function(plasma) {
           if(code == 0)
             next && next(c)
           else
-            next && next(new Error("failed "+args))
+            next && next(new Error("failed "+cmd))
         })
       }
     }

@@ -1,14 +1,5 @@
 #!/usr/bin/env node
 var Angel = require("../Angel");
-var EventEmitter = require('events').EventEmitter;
-
-var toJSON = module.exports.toJSON = function(c){
-  return JSON.stringify(c, function(key, value){
-    if(typeof value == "object" && value instanceof EventEmitter && value.pid)
-      return {pid: value.pid}
-    return value
-  })
-}
 
 var constructChemical = module.exports.constructChemical = function(argv) {
   var chemical = {
@@ -48,6 +39,5 @@ if(!module.parent) {
       else
         console.log(c)
     })
-
   })
 }
