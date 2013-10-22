@@ -11,33 +11,59 @@ var expandPaths = function(dna) {
 
 module.exports = function Angel(dna){
 
-  var angelDNAPath = path.join(process.cwd(),"dna","angel");
+  var self = this
   this.plasma = new organic.Plasma();
 
   if(!dna) {
-    var self = this;
-    dna = new organic.DNA();
-    dna.loadDir(path.join(__dirname,"dna"), function(){
-      expandPaths(dna)
-
-      fs.exists(angelDNAPath, function(found){
-        if(!found) {
-          self.start(dna)
-        } else {
-          dna.loadDir(angelDNAPath,"angel", function(){
-            dna.mergeBranchInRoot("angel");
-            self.start(dna)
-          })
-        }
-      })
+    this.loadSelfDNA(new organic.DNA(), function(dna){
+      self.start(dna)
     })
   } else
+  if(typeof dna == "string") {
+    this.loadDnaByPath(dna, function(dna){
+      self.start(dna)
+    })
+  }
+  else
     this.start(dna)
+}
+
+module.exports.prototype.loadSelfDNA = function(dna, next){
+  var self = this
+  dna.loadDir(path.join(__dirname,"dna"), function(){
+    expandPaths(dna)
+    var angelDNAPath = path.join(process.cwd(),"dna","angel");
+    fs.exists(angelDNAPath, function(found){
+      if(!found) {
+        next(dna)
+      } else {
+        dna.loadDir(angelDNAPath,"angel", function(){
+          dna.mergeBranchInRoot("angel");
+          next(dna)
+        })
+      }
+    })
+  })
+}
+
+
+module.exports.prototype.loadDnaByPath = function(path, next) {
+  if(path.extname(path) == ".json") {
+    var dna = new organic.DNA()
+    dna.loadFile(path, function(){
+      next(dna)
+    })
+  } else {
+    var dna = new organic.DNA()
+    dna.loadDir(path, function(){
+      next(dna)
+    })
+  }
 }
 
 module.exports.prototype.start = function(dna){
   organic.Cell.call(this, dna);
   this.plasma.emit({"type": "build", branch: "membrane"})
   this.plasma.emit({"type": "build", branch: "plasma"})
-  this.plasma.emit({type: "Angel"});
+  this.plasma.emit({type: "ready"})
 }

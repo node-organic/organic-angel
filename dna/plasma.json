@@ -1,29 +1,9 @@
 {
-  "react": {
-    "source": "commands/react"
+  "shellreactor": {
+    "source": "node_modules/organic-shellreactor",
+    "reactOn": "command"
   },
-  "cell": {
-    "source": "commands/cell"
-  },
-  "start": {
-    "source": "commands/start"
-  },
-  "install": {
-    "source": "commands/install"
-  },
-  "remove": {
-    "source": "commands/remove"
-  },
-  "stop": {
-    "source": "commands/stop"
-  },
-  "restart": {
-    "source": "commands/restart"
-  },
-  "upgrade": {
-    "source": "commands/upgrade"
-  },
-  "status": {
-    "source": "commands/status"
+  "shellcmds": {
+    "source": "node_modules/organic-shellreactor-cellcmds"
   }
 }

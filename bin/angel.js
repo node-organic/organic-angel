@@ -4,7 +4,9 @@ var Angel = require("../Angel");
 var constructChemical = module.exports.constructChemical = function(argv) {
   var chemical = {
     type: argv.shift(),
-    value: []
+    value: [],
+    stdout: process.stdout,
+    stderr: process.stderr
   }
   var memoKey = null
   for(var i = 0; i<argv.length; i++) {
@@ -27,7 +29,7 @@ var constructChemical = module.exports.constructChemical = function(argv) {
 
 if(!module.parent) {
   var instance = new Angel();
-  instance.plasma.on("Angel", function(){
+  instance.plasma.on("ready", function(){
     var argv = process.argv.splice(2)
     var chemical = constructChemical(argv)
     instance.plasma.emit(chemical, function(c){
