@@ -1,4 +1,4 @@
-# Angel #
+# Angel
 
     $ angel command cell staging install
     $ angel command cell staging start

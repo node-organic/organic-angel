@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 var Angel = require("../Angel");
+var ChildProcess = require("child_process").ChildProcess
 
 var constructChemical = module.exports.constructChemical = function(argv) {
   var chemical = {
@@ -33,11 +34,16 @@ if(!module.parent) {
     var argv = process.argv.splice(2)
     var chemical = constructChemical(argv)
     instance.plasma.emit(chemical, function(c){
+      if(c.pid && c.stdout && c.stderr) {
+        c.stdout.pipe(process.stdout)
+        c.stderr.pipe(process.stderr)
+        c.on("close", function(code){
+          if(code != 0)
+            console.error("failed ", chemical)
+        })
+      } else
       if(c instanceof Error)
         console.error(c.stack)
-      else
-      if(c && typeof c.code != "undefined")
-        process.exit(c.code)
       else
         console.log(c)
     })

@@ -1,9 +1,0 @@
-{
-  "shellreactor": {
-    "source": "node_modules/organic-shellreactor",
-    "reactOn": "command"
-  },
-  "shellcmds": {
-    "source": "node_modules/organic-shellreactor-cellcmds"
-  }
-}
