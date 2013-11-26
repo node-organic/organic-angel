@@ -38,8 +38,11 @@ module.exports.prototype.loadDnaByPath = function(p, next) {
       next(dna)
     })
   } else {
-    dna.loadDir(p, function(){
-      next(dna)
+    fs.exists(p, function(found){
+      if(!found) return next(dna)
+      dna.loadDir(p, function(){
+        next(dna)
+      })    
     })
   }
 }
@@ -51,10 +54,16 @@ module.exports.prototype.start = function(dna){
   this.plasma.emit({"type": "build", branch: "membrane"})
   this.plasma.emit({"type": "build", branch: "plasma"})
 
-  this.loadScripts(dna.scripts, function(err){
-    if(err) return console.error(err)
-    self.plasma.emit({type: "ready"})
-  })
+  if(dna.scripts)
+    this.loadScripts(dna.scripts, function(err){
+      if(err) return console.error(err)
+      self.plasma.emit({type: "ready"})
+    })
+  else
+    // delay ready event to fall in async execution
+    process.nextTick(function(){
+      self.plasma.emit({type: "ready"})  
+    })
 }
 
 module.exports.prototype.loadScripts = function(/* Array | path parts,... next */) {
@@ -62,7 +71,7 @@ module.exports.prototype.loadScripts = function(/* Array | path parts,... next *
   
   // loadScripts(Array([]), next)
   if(Array.isArray(arguments[0])) {
-    return async.each(dna.scripts, function(f, n){
+    return async.each(arguments[0], function(f, n){
       // npm install each script unless specified
       if(!self.dna.skipStartupInstall) {
         npm.load(require(process.cwd()+"/package.json"), function (er) {
@@ -86,11 +95,14 @@ module.exports.prototype.loadScripts = function(/* Array | path parts,... next *
         var m = require(f)
         if(m.length == 2)
           return m(self, n)
-        m(self)
-        n()  
+        // however it is expected async execution, thus delay via nextTick
+        process.nextTick(function(){
+          m(self)
+          n()  
+        })
       }
 
-    }, next)
+    }, arguments[1])
   }
 
   // loadScripts(path1, path2, ... next)
@@ -103,6 +115,7 @@ module.exports.prototype.loadScripts = function(/* Array | path parts,... next *
       return path.join(rootDir, f)
     })
     async.each(files, function(f, n){
+      if(path.extname(f) != ".js") return n()
       var m = require(f)
       if(m.length == 2)
         return m(self, n)
@@ -113,21 +126,20 @@ module.exports.prototype.loadScripts = function(/* Array | path parts,... next *
 }
 
 module.exports.prototype.on = function(pattern, handler) {
-  var placeholderPattern = /:([a-z\(\)\|\.\*]+)(\s|$)/
+  var placeholderPattern = /:([a-z0-9\(\)\|\.\*]+)/g
   var optionParts = []
   var original = pattern
   var m = pattern.match(placeholderPattern)
-  while(m) {
-    if(m[1].match(/\(*.\)/)) {
-      var mm = m[1].match(/(.*)\(/)[1]
-      optionParts.push(mm)
-      pattern = pattern.replace(/:([a-z]+)\(/, "(")
-    } else {
-      optionParts.push(m[1])
-      pattern = pattern.replace(m[0], "(.*) ")
-    }
-    m = pattern.match(placeholderPattern)
-  }
+  if(m)
+    for(var i = 0; i<m.length; i++)
+      if(m[i].match(/\(*.\)/)) {
+        var mm = m[i].match(/(.*)\(/)[1].substr(1)
+        optionParts.push(mm)
+        pattern = pattern.replace(/:([a-z0-9]+)\(/, "(")  
+      } else {
+        optionParts.push(m[i].substr(1))
+        pattern = pattern.replace(m[i], "(.*)")  
+      }
   pattern = new RegExp(pattern, "i")
   this.$handlers.push({
     pattern: pattern,
@@ -136,7 +148,24 @@ module.exports.prototype.on = function(pattern, handler) {
   })
 }
 
+module.exports.prototype.defaultDoHandler = function(err, result){
+  if(err) {
+    console.error(err)
+    return process.exit(1)
+  }
+  if(result && result.stdout && result.stderr && result.on) {
+    result.stdout.pipe(process.stdout)
+    result.stderr.pipe(process.stderr)
+    result.on("close", function(code){
+      process.exit(code)
+    })
+  }
+  process.stdout.write(JSON.stringify(result))
+}
+
 module.exports.prototype.do = function(input, next) {
+  if(!next)
+    next = this.defaultDoHandler
   var handlersChain = []
   for(var i = 0; i<this.$handlers.length; i++) {
     var matched = input.match(this.$handlers[i].pattern)
@@ -160,11 +189,11 @@ module.exports.prototype.do = function(input, next) {
     return pair.handler(pair.options, next)
   }
   var lastResult = null
-  async.eachSeries(handlersChain, function(pair, next){
+  async.eachSeries(handlersChain, function(pair, n){
     pair.handler(pair.options, function(err, result){
-      if(err) return next(err)
+      if(err) return n(err)
       lastResult = result
-      next()
+      n()
     })
   }, function(err){
     if(err) return next(err)

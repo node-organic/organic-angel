@@ -1,0 +1,7 @@
+{
+  "scripts": [
+    "./tests/data/script.js",
+    "./tests/data/chat.js"
+  ],
+  "skipStartupInstall": true
+}
