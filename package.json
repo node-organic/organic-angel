@@ -9,7 +9,10 @@
     "test": "jasmine-node ./tests/"
   },
   "dependencies": {
-    "organic": "0.1.1"
+    "organic": "0.1.1",
+    "underscore": "*",
+    "async": "*",
+    "npm": "*"
   },
   "devDependencies": {
     "jasmine-node": "1.11.0"
