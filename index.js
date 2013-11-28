@@ -4,16 +4,18 @@ var fs = require("fs");
 var async = require("async")
 var _ = require("underscore")
 var npm = require("npm")
+var Reactor = require("./reactor")
 
 module.exports = function Angel(dna){
 
   var self = this
-  this.$handlers = []
+  
   this.plasma = new organic.Plasma();
+  this.reactor = new Reactor()
 
   if(!dna) {
-    this.loadSelfDNA(function(dna){
-      self.start(dna)
+    this.loadDnaByPath(path.join(process.cwd(),"dna"),function(dna){
+      self.start(dna.angel)
     })
   } else
   if(typeof dna == "string") {
@@ -23,12 +25,6 @@ module.exports = function Angel(dna){
   }
   else
     this.start(dna)
-}
-
-module.exports.prototype.loadSelfDNA = function(next){
-  this.loadDnaByPath(path.join(process.cwd(),"dna"),function(dna){
-    next(new organic.DNA(dna.angel))
-  })
 }
 
 module.exports.prototype.loadDnaByPath = function(p, next) {
@@ -48,22 +44,64 @@ module.exports.prototype.loadDnaByPath = function(p, next) {
 }
 
 module.exports.prototype.start = function(dna){
+  dna = dna instanceof organic.DNA?dna:new organic.DNA(dna)
+  if(dna.index)
+    dna.mergeBranchInRoot("index")
   organic.Cell.call(this, dna);
-  var self = this
+  
   this.dna = dna
   this.plasma.emit({"type": "build", branch: "membrane"})
   this.plasma.emit({"type": "build", branch: "plasma"})
 
-  if(dna.scripts)
-    this.loadScripts(dna.scripts, function(err){
+  var self = this
+  if(dna.scripts) {
+    var next = function(err){
       if(err) return console.error(err)
       self.plasma.emit({type: "ready"})
-    })
-  else
+    }
+    if(dna.installScripts)
+      this.installAndLoadScripts(dna.scripts, next)
+    else
+      this.loadScripts(dna.scripts, next)
+  } else {
     // delay ready event to fall in async execution
     process.nextTick(function(){
       self.plasma.emit({type: "ready"})  
     })
+  }
+}
+
+module.exports.prototype.loadScript = function(script, next) {
+  // require the module
+  var self = this
+  if(script.indexOf(".") === 0)
+    script = path.join(process.cwd(), script)
+  if(script.indexOf("/") !== 0 && script.indexOf(":") !== 1)
+    script = path.join(process.cwd(), "node_modules", script)
+  var m = require(script)
+  if(m.length == 2)
+    return m(this, next)
+  process.nextTick(function(){
+    m(self)
+    next()  
+  })
+}
+
+module.exports.prototype.installAndLoadScripts = function(scripts, next) {
+  var self = this
+
+  async.each(scripts, function(f, n){
+    npm.load(require(process.cwd()+"/package.json"), function (er) {
+      if (er) return n(er)
+      npm.commands.install([f], function (er, data) {
+        if (er) return n(er)
+        // npm install done
+        self.loadScript(f, n)
+      })
+      if(self.dna.verbose)
+        npm.on("log", function (message) { process.stdout.write(message) })
+    })
+  }, next)
 }
 
 module.exports.prototype.loadScripts = function(/* Array | path parts,... next */) {
@@ -72,36 +110,7 @@ module.exports.prototype.loadScripts = function(/* Array | path parts,... next *
   // loadScripts(Array([]), next)
   if(Array.isArray(arguments[0])) {
     return async.each(arguments[0], function(f, n){
-      // npm install each script unless specified
-      if(!self.dna.skipStartupInstall) {
-        npm.load(require(process.cwd()+"/package.json"), function (er) {
-          if (er) return n(er)
-          npm.commands.install([f], function (er, data) {
-            if (er) return n(er)
-            // npm install done
-
-            // require the module
-            var m = require(f)
-            if(m.length == 2)
-              return m(self, n)
-            m(self)
-            n()    
-          })
-          if(self.dna.verbose)
-            npm.on("log", function (message) { process.stdout.write(message) })
-        })
-      } else {
-        // npm install for script is not executed
-        var m = require(f)
-        if(m.length == 2)
-          return m(self, n)
-        // however it is expected async execution, thus delay via nextTick
-        process.nextTick(function(){
-          m(self)
-          n()  
-        })
-      }
-
+      self.loadScript(f, n)
     }, arguments[1])
   }
 
@@ -116,36 +125,30 @@ module.exports.prototype.loadScripts = function(/* Array | path parts,... next *
     })
     async.each(files, function(f, n){
       if(path.extname(f) != ".js") return n()
-      var m = require(f)
-      if(m.length == 2)
-        return m(self, n)
-      m(self)
-      n()
+      self.loadScript(f, n)
     }, next)
   })
 }
 
 module.exports.prototype.on = function(pattern, handler) {
-  var placeholderPattern = /:([a-z0-9\(\)\|\.\*]+)/g
-  var optionParts = []
-  var original = pattern
-  var m = pattern.match(placeholderPattern)
-  if(m)
-    for(var i = 0; i<m.length; i++)
-      if(m[i].match(/\(*.\)/)) {
-        var mm = m[i].match(/(.*)\(/)[1].substr(1)
-        optionParts.push(mm)
-        pattern = pattern.replace(/:([a-z0-9]+)\(/, "(")  
-      } else {
-        optionParts.push(m[i].substr(1))
-        pattern = pattern.replace(m[i], "(.*)")  
-      }
-  pattern = new RegExp(pattern, "i")
-  this.$handlers.push({
-    pattern: pattern,
-    optionParts: optionParts,
-    handler: handler
-  })
+  this.reactor.on(pattern, handler)
+}
+
+module.exports.prototype.do = function(input, options, next) {
+  if(typeof options == "function") {
+    next = options
+    options = undefined
+  }
+  if(!next)
+    next = this.defaultDoHandler
+  this.reactor.do(input, options, next)
+}
+
+module.exports.prototype.react = function(input, dataName) {
+  var self = this
+  return function(c, next) {
+    self.do(input, dataName?c[dataName]:c, next)
+  }
 }
 
 module.exports.prototype.defaultDoHandler = function(err, result){
@@ -160,45 +163,14 @@ module.exports.prototype.defaultDoHandler = function(err, result){
       process.exit(code)
     })
   }
-  process.stdout.write(JSON.stringify(result))
-}
-
-module.exports.prototype.do = function(input, next) {
-  if(!next)
-    next = this.defaultDoHandler
-  var handlersChain = []
-  for(var i = 0; i<this.$handlers.length; i++) {
-    var matched = input.match(this.$handlers[i].pattern)
-    if(matched && matched.length-1 == this.$handlers[i].optionParts.length) {
-      var handler = this.$handlers[i].handler
-      var optionParts = this.$handlers[i].optionParts
-      if(this.$handlers[i].once)
-        this.$handlers.splice(i, 1)
-      var options = {}
-      for(var k = 0; k<optionParts.length; k++)
-        options[optionParts[k]] = matched[k+1]
-      handlersChain.push({
-        options: options,
-        handler: handler
-      })
-    }
-  }
-  if(handlersChain.length == 0) return next(new Error("command not found"))
-  if(handlersChain.length == 1) {
-    var pair = handlersChain[0]
-    return pair.handler(pair.options, next)
-  }
-  var lastResult = null
-  async.eachSeries(handlersChain, function(pair, n){
-    pair.handler(pair.options, function(err, result){
-      if(err) return n(err)
-      lastResult = result
-      n()
-    })
-  }, function(err){
-    if(err) return next(err)
-    next(null, lastResult)
-  })
+  if(typeof result == "string")
+    process.stdout.write(result+"\n")
+  else
+    process.stdout.write(JSON.stringify(result, function(key, value){
+      if(value && typeof value == "object" && value.pid)
+        return {pid: value.pid};
+      return value;
+    }, 2)+"\n")
 }
 
 module.exports.prototype.has = function(key) {
@@ -209,6 +181,6 @@ module.exports.prototype.get = function(key) {
   return this.dna[key]
 }
 
-module.exports.prototype.cloneDNA = function(extra){
-  return _.extend({}, this.dna, extra)
+module.exports.prototype.defaults = function(extra){
+  return _.extend({}, this.dna.defaults, extra)
 }

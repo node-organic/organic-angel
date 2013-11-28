@@ -2,12 +2,13 @@ describe("Angel", function(){
   var Angel = require("../index")
   describe("with custom handlers", function(){
     var instance;
-    it("constructs and starts", function(next){
+    beforeEach(function(next){
       instance = new Angel()
       instance.plasma.on("ready", function(){
         next()
       })
     })
+
     it("plain match", function(next){
       instance.on("first", function(options, n){
         n(null, {data: "Test"})
@@ -63,13 +64,28 @@ describe("Angel", function(){
         next()
       })
     })
+    it("match with optional placeholders", function(next){
+      instance.on("f :test? :test2?", function(options, n){
+        n(null, options)
+      })
+      instance.do("f a1 a2", function(err, result){
+        expect(err).toBe(null)
+        expect(result['test']).toBe("a1")
+        expect(result['test2']).toBe("a2")
+        instance.do("f a1", function(err, result){
+          expect(err).toBe(null)
+          expect(result['test']).toBe("a1")
+          expect(result['test2']).not.toBeDefined()
+          next()  
+        })  
+      })
+    })
   })
   describe("with predefined dna scripts", function(){
     var instance;
     it("constructs and starts", function(next){
       instance = new Angel({
-        scripts: [__dirname+"/data/script.js"],
-        skipStartupInstall: true
+        scripts: [__dirname+"/data/script.js"]
       })
       instance.plasma.on("ready", function(){
         instance.do("script test", function(err, result){
@@ -82,9 +98,7 @@ describe("Angel", function(){
   describe("with loading scripts dynamically", function(){
     var instance;
     it("constructs and starts", function(next){
-      instance = new Angel({
-        skipStartupInstall: true
-      })
+      instance = new Angel()
       instance.plasma.on("ready", function(){
         instance.loadScripts(__dirname, "data", function(){
           instance.do("script test", function(err, result){

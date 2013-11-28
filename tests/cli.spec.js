@@ -4,7 +4,7 @@ describe("angel via cli", function(){
   it("executes based on custom dna", function(next){
     exec("node ./bin/angel.js ./tests/data/dna.json script echo", function (error, stdout, stderr) {
       expect(error).toBe(null)
-      expect(stdout).toBe('"echo"')
+      expect(stdout).toBe('echo\n')
       expect(stderr).toBe('')
       next()
     })
@@ -20,7 +20,7 @@ describe("angel via cli", function(){
       } 
       if(state == 1) {
         if(chunk.toString() == "> ") return
-        expect(chunk.toString()).toBe('"hi"')
+        expect(chunk.toString()).toBe('hi\n')
         child.stdin.end()
         state = 2
         next()
