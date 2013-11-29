@@ -7,15 +7,21 @@ var npm = require("npm")
 var Reactor = require("./reactor")
 
 module.exports = function Angel(dna){
-
   var self = this
   
   this.plasma = new organic.Plasma();
   this.reactor = new Reactor()
 
   if(!dna) {
-    this.loadDnaByPath(path.join(process.cwd(),"dna"),function(dna){
-      self.start(dna.angel)
+    fs.exists(path.join(process.cwd(), "angel.json"), function(exists){
+      if(exists)
+        self.loadDnaByPath(path.join(process.cwd(), "angel.json"), function(dna){
+          self.start(dna)
+        })
+      else
+        self.loadDnaByPath(path.join(process.cwd(), "dna"), function(dna){
+          self.start(dna)
+        })
     })
   } else
   if(typeof dna == "string") {
@@ -29,18 +35,22 @@ module.exports = function Angel(dna){
 
 module.exports.prototype.loadDnaByPath = function(p, next) {
   var dna = new organic.DNA()
-  if(path.extname(p) == ".json") {
-    dna.loadFile(p, function(){
-      next(dna)
-    })
-  } else {
-    fs.exists(p, function(found){
-      if(!found) return next(dna)
-      dna.loadDir(p, function(){
+  fs.exists(p, function(found){
+    if(!found) return next(dna)
+
+    if(path.extname(p) == ".json") {
+      dna.loadFile(p, function(){
         next(dna)
-      })    
-    })
-  }
+      })
+    } else {
+      dna.loadDir(p, function(){
+        if(dna.angel)
+          next(dna.angel)
+        else
+          next(dna)
+      })
+    }
+  })
 }
 
 module.exports.prototype.start = function(dna){
