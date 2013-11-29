@@ -82,6 +82,7 @@ There are various scripts already - use the code ;)
 
     $ angel ./path/to/angel/dir/ ...
       -> Load all `.json` files recusively
+      -> use dna.angel or just dna as root configuration
       -> merge `index.json` to root dna
       -> construct dna.plasma
       -> construct dna.membrane
@@ -91,8 +92,10 @@ There are various scripts already - use the code ;)
 
     $ cd ./directory
     $ angel ...
-      -> try to load all `.json` files recursively in `./dna`
-      -> use dna.angel as root dna
+      -> try to load `./angel.json` if not 
+        -> try to load all `.json` files recursively in `./dna`
+        -> use dna.angel or just dna as root configuration
+        -> merge `index.json` to root dna
       -> construct dna.plsma
       -> construct dna.memberne
       -> load `dna.scripts`
