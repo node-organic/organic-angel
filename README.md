@@ -169,3 +169,21 @@ or
 
     $ npm install organic-angel -g
     $ angel do something for time
+
+
+# Thanks to
+
+## organic
+https://github.com/varnalab/node-organic
+
+## underscore
+http://underscorejs.org
+
+## async
+https://github.com/caolan/async
+
+## npm
+http://npmjs.org
+
+## string-template
+https://github.com/Matt-Esch/string-template
