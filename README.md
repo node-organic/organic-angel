@@ -1,4 +1,4 @@
-# Angel
+# Angel v0.2.2
 
 Simple as task runner, however with extra-ordinary abilities, 
 `angel` is a command line assistant.
@@ -12,7 +12,7 @@ react to the process' command line arguments and to
 stdin via build-in reactor.
 
 
-## Scripts
+## Scripts and Abilities syntax
 
     module.exports = function(angel [, next]) {
       // next is optional, if the scripts needs async loading.
@@ -31,51 +31,49 @@ There are various scripts already - use the code ;)
 
 ## Angel API
 
-    angel.on(pattern, handler)
+### angel.cmdData
+
+Available only when angel is used within `angel.on` handler.
+
+### angel.dna
+
+DNA instance, it contains boot configuration
+
+### angel.report
+
+### angel.loadScripts
+
+### angel.on(pattern, handler)
 
 * `pattern` : String with placeholders , like 'echo :value'
-* `handler` : `function(options, next)`, where
-  * `options` : Object containg the placeholder's values
+* `handler` : `function(angel, next)`, where
+  * `angel` : Object containg the placeholder's values within `cmdData` property
   * `next` : `function(err, result)` to be executed next with arguments
 
-<br />
-
-    angel.do(command [, commandData [,  handler]])
+### angel.do(command [, handler])
 
 * `command` : String, like 'echo test' or with placeholders like 'echo {value}'
-* `commandData` : Object where every key will replace any `{placeholder}` once matched
-* `handler` : `function(err, result)`, called onces what have to be done is done.
+* `handler` : `function(err, result)`, if not present, then `angel.do` will 
+return a reaction fn, see [reactions](https://github.com/vbogdanov/reactions) for details.
 
-<br />
+### angel.defaultDoHandler
 
-    var reaction = angel.react(command [, commandDataName])
-    reaction(commandData, nextHandler)
+### angel.react(command)
 
-* Useful to create reaction of angel's `do`
-* `commandDataName` : String, indicates the property from `commandData` to be used
-* `commandData` : Object, used to replace placeholders
-* `nextHandler` : `function(err, result)`, result of the reaction
 
-<br />
-
-    angel.loadScripts(path, innerPath [, nextHandler])
+### angel.loadScripts(path, innerPath [, nextHandler])
 
 * all arguments except the last are parts of a path which is joined.
 * `nextHandler` : `function(err)`, called once all scripts are completely loaded.
 
-<br />
-
-    angel.defaults(extra)
-
-* does a copy of `angel.dna` and extends it with `extra` object
-
-
-## cli-Abilities and boot sequence
+## boot sequences
 
     $ angel ./path/to/angel.json ...
       -> Load given angel.json as root dna
+      -> merge `index.json` to root dna
       -> construct dna.plasma
       -> construct dna.membrane
+      -> load `dna.abilities`
       -> load `dna.scripts`
       -> react ...
 <br />
@@ -86,6 +84,7 @@ There are various scripts already - use the code ;)
       -> merge `index.json` to root dna
       -> construct dna.plasma
       -> construct dna.membrane
+      -> load `dna.abilities`
       -> load `dna.scripts`
       -> react ...
 <br />
@@ -98,6 +97,7 @@ There are various scripts already - use the code ;)
         -> merge `index.json` to root dna
       -> construct dna.plsma
       -> construct dna.memberne
+      -> load `dna.abilities`
       -> load `dna.scripts`
       -> react ...
 <br />
@@ -127,8 +127,8 @@ First
 
     // ./script.js
     module.exports = function(angel){
-      angel.on("do something for :topic", function(options, next){
-        if(options.topic == "time")
+      angel.on("do something for :topic", function(angel, next){
+        if(angel.cmdData.topic == "time")
           console.log("The time is "+(new Date()).toString())
         else
           console.error("sorry")
