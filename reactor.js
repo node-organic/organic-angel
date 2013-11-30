@@ -1,5 +1,4 @@
 var async = require("async")
-var format = require("string-template")
 
 module.exports = function(){
   this.$handlers = []
@@ -36,11 +35,8 @@ module.exports.prototype.on = function(pattern, handler) {
   })
 }
 
-module.exports.prototype.do = function(input, options, next) {
+module.exports.prototype.do = function(input, next) {
   var handlersChain = []
-
-  if(options)
-    input = format(input, options)
 
   for(var i = 0; i<this.$handlers.length; i++) {
     var matched = input.match(this.$handlers[i].pattern)

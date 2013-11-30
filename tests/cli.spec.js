@@ -15,7 +15,7 @@ describe("angel via cli", function(){
     child.stdout.on("data", function(chunk){
       if(state == 0) {
         expect(chunk.toString()).toBe("> ")
-        child.stdin.write("angel.do('script hi')\n")
+        child.stdin.write("angel.react('script hi')\n")
         state = 1
       } 
       if(state == 1) {

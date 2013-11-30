@@ -12,7 +12,7 @@ if(!module.parent) {
     else
       instance = new Angel()
     instance.plasma.on("ready", function(){
-      instance.do(argv.join(" "))
+      instance.react(argv.join(" "))
     })
   })
 }

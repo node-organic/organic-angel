@@ -3,14 +3,21 @@ var path = require("path");
 var fs = require("fs");
 var async = require("async")
 var _ = require("underscore")
-var npm = require("npm")
+var format = require("string-template")
 var Reactor = require("./reactor")
+var Loader = require("./loader")
 
 module.exports = function Angel(dna){
   var self = this
   
   this.plasma = new organic.Plasma();
   this.reactor = new Reactor()
+  this.abilities = new Loader(function(){
+    return self
+  })
+  this.scripts = new Loader(function(){
+    return self.clone()
+  })
 
   if(!dna) {
     fs.exists(path.join(process.cwd(), "angel.json"), function(exists){
@@ -64,101 +71,46 @@ module.exports.prototype.start = function(dna){
   this.plasma.emit({"type": "build", branch: "plasma"})
 
   var self = this
-  if(dna.scripts) {
-    var next = function(err){
+  self.abilities.load(dna.abilities || [], function(err){
+    if(err) return console.error(err)
+    self.scripts.load(dna.scripts || [], function(err){
       if(err) return console.error(err)
-      self.plasma.emit({type: "ready"})
-    }
-    if(dna.installScripts)
-      this.installAndLoadScripts(dna.scripts, next)
-    else
-      this.loadScripts(dna.scripts, next)
-  } else {
-    // delay ready event to fall in async execution
-    process.nextTick(function(){
-      self.plasma.emit({type: "ready"})  
+      process.nextTick(function(){
+        self.plasma.emit({type: "ready"})    
+      })  
     })
-  }
-}
-
-module.exports.prototype.loadScript = function(script, next) {
-  // require the module
-  var self = this
-  if(script.indexOf(".") === 0)
-    script = path.join(process.cwd(), script)
-  if(script.indexOf("/") !== 0 && script.indexOf(":") !== 1)
-    script = path.join(process.cwd(), "node_modules", script)
-  var m = require(script)
-  if(m.length == 2)
-    return m(this, next)
-  process.nextTick(function(){
-    m(self)
-    next()  
   })
 }
 
-module.exports.prototype.installAndLoadScripts = function(scripts, next) {
+module.exports.prototype.loadScripts = function(){
   var self = this
-
-  async.each(scripts, function(f, n){
-    npm.load(require(process.cwd()+"/package.json"), function (er) {
-      if (er) return n(er)
-      npm.commands.install([f], function (er, data) {
-        if (er) return n(er)
-        // npm install done
-        self.loadScript(f, n)
-      })
-      if(self.dna.verbose)
-        npm.on("log", function (message) { process.stdout.write(message) })
-    })
-  }, next)
+  self.scripts = new Loader(function(){
+    return self.clone()
+  })
+  self.scripts.load.apply(self.scripts, arguments)
 }
 
-module.exports.prototype.loadScripts = function(/* Array | path parts,... next */) {
-  var self = this
-  
-  // loadScripts(Array([]), next)
-  if(Array.isArray(arguments[0])) {
-    return async.each(arguments[0], function(f, n){
-      self.loadScript(f, n)
-    }, arguments[1])
-  }
-
-  // loadScripts(path1, path2, ... next)
-  var args = Array.prototype.slice.call(arguments, 0)
-  var next = args.pop()
-  var rootDir = path.join.apply(path, args)
-  var self = this
-  fs.readdir(rootDir, function(err, files){
-    files = files.map(function(f){
-      return path.join(rootDir, f)
-    })
-    async.each(files, function(f, n){
-      if(path.extname(f) != ".js") return n()
-      self.loadScript(f, n)
-    }, next)
-  })
+module.exports.prototype.clone = function(){
+  return _.extend({}, this)
 }
 
 module.exports.prototype.on = function(pattern, handler) {
-  this.reactor.on(pattern, handler)
-}
-
-module.exports.prototype.do = function(input, options, next) {
-  if(typeof options == "function") {
-    next = options
-    options = undefined
-  }
-  if(!next)
-    next = this.defaultDoHandler
-  this.reactor.do(input, options, next)
-}
-
-module.exports.prototype.react = function(input, dataName) {
   var self = this
-  return function(c, next) {
-    self.do(input, dataName?c[dataName]:c, next)
+  this.reactor.on(pattern, function(cmdData, next){
+    handler(_.extend(self.clone(), {cmdData: cmdData}), next)
+  })
+}
+
+module.exports.prototype.do = function(input, next) {
+  if(next)
+    return this.reactor.do(format(input, this.cmdData), next)
+  return function(angel, next){
+    angel.reactor.do(format(input, angel.cmdData), next)
   }
+}
+
+module.exports.prototype.react = function(input) {
+  this.do(input, this.defaultDoHandler)
 }
 
 module.exports.prototype.defaultDoHandler = function(err, result){
@@ -181,16 +133,4 @@ module.exports.prototype.defaultDoHandler = function(err, result){
         return {pid: value.pid};
       return value;
     }, 2)+"\n")
-}
-
-module.exports.prototype.has = function(key) {
-  return typeof this.dna[key] != "undefined"
-}
-
-module.exports.prototype.get = function(key) {
-  return this.dna[key]
-}
-
-module.exports.prototype.defaults = function(extra){
-  return _.extend({}, this.dna.defaults, extra)
 }
