@@ -1,10 +1,18 @@
 var async = require("async")
+var _ = require("underscore")
 
 module.exports = function(){
   this.$handlers = []
 }
 
-module.exports.prototype.on = function(pattern, handler) {
+module.exports.prototype.createReactionData = function(pattern, handler) {
+  if(pattern instanceof RegExp)
+    return {
+      originalPattern: pattern,
+      pattern: pattern,
+      handler: handler
+    }
+
   var placeholderPattern = /:([a-zA-Z0-9\\\(\)\|\.\*\]\[\?=]+)/g
   var optionParts = []
   var original = pattern
@@ -26,13 +34,22 @@ module.exports.prototype.on = function(pattern, handler) {
         pattern = pattern.replace(" "+placeholder, "\\s?([a-zA-Z0-9/\\\\-_.\\+;:=\\+\\-~\\(\\)]+)")
       }
     }
-  pattern = new RegExp(pattern+"$")
-  this.$handlers.push({
-    pattern: pattern,
+
+  return {
+    originalPattern: pattern,
+    pattern: RegExp(pattern+"$"),
     optionParts: optionParts,
     optionalParts: optionalParts,
     handler: handler
-  })
+  } 
+}
+
+module.exports.prototype.on = function(pattern, handler) {
+  this.$handlers.push(this.createReactionData(pattern, handler))
+}
+
+module.exports.prototype.once = function(pattern, handler) {
+  this.$handlers.push(_.extend(this.createReactionData(pattern, handler), {once: true}))
 }
 
 module.exports.prototype.do = function(input, next) {
@@ -40,20 +57,27 @@ module.exports.prototype.do = function(input, next) {
 
   for(var i = 0; i<this.$handlers.length; i++) {
     var matched = input.match(this.$handlers[i].pattern)
-    //console.log(matched, this.$handlers[i].pattern, input)
-    if(matched && matched.length-1 == this.$handlers[i].optionParts.length) {
-      var handler = this.$handlers[i].handler
-      var optionParts = this.$handlers[i].optionParts
-      if(this.$handlers[i].once)
-        this.$handlers.splice(i, 1)
-      var options = {}
-      for(var k = 0; k<optionParts.length; k++)
-        if(matched[k+1])
-          options[optionParts[k]] = matched[k+1]
-      handlersChain.push({
-        options: options,
-        handler: handler
-      })
+    if(matched) {
+      if(this.$handlers[i].optionParts && 
+        matched.length-1 == this.$handlers[i].optionParts.length) {
+        var handler = this.$handlers[i].handler
+        var optionParts = this.$handlers[i].optionParts
+        if(this.$handlers[i].once)
+          this.$handlers.splice(i, 1)
+        var options = {}
+        for(var k = 0; k<optionParts.length; k++)
+          if(matched[k+1])
+            options[optionParts[k]] = matched[k+1]
+        handlersChain.push({
+          options: options,
+          handler: handler
+        })
+      } else {
+        handlersChain.push({
+          options: matched,
+          handler: this.$handlers[i].handler
+        })
+      }
     }
   }
   if(handlersChain.length == 0) return next(new Error("no handlers found"))

@@ -4,8 +4,8 @@ var fs = require("fs");
 var async = require("async")
 var _ = require("underscore")
 var format = require("string-template")
-var Reactor = require("./reactor")
-var Loader = require("./loader")
+var Reactor = require("./src/reactor")
+var Loader = require("./src/loader")
 
 module.exports = function Angel(dna){
   var self = this

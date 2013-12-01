@@ -4,69 +4,154 @@ Simple as task runner, however with extra-ordinary abilities,
 `angel` is a command line assistant.
 
     $ angel do something
+    angel> what to do? hints:
+    angel> 1) check projects
+    angel> 2) create project
+    angel> 3) open project
+    
+    $ angel create project
+    angel> what kind of project? hints:
+    angel> 1) web
+    angel> 2) mobile
 
-The above is command line usage. Angel similar to 
-[hubot](http://hubot.github.com/) can load several 
-scripts/scenarious/modules and/or plugins which all
-react to the process' command line arguments and to 
-stdin via build-in reactor.
+    $ angel create web project
+    angel> please specify technology? hints:
+    angel> 1) html5/css/js
+    angel> 2) nodejs+html5/css/js
 
+    $ angel create web project with nodejs+html5/css/js
+    $ angel deploy to staging && angel inspect staging
+
+    $ angel how are you?
+    angel> almost up-to-date, thanks. I see that there are new versions of some of mine components:
+    * angelabilities v0.0.3
+    * angelscripts v0.0.5
+    Would you like to engage update? (y/n)
+
+The above is example command line usage. Note that even 
+the above is not ready yet, it is absolutely possible.
+
+Angel is similar as concept to bots, like [hubot](http://hubot.github.com/), however 
+it is for command line. It can be mapped also as `the command line assistant`.
 
 ## Scripts and Abilities syntax
 
     module.exports = function(angel [, next]) {
-      // next is optional, if the scripts needs async loading.
-      angel.on("hi", function(options [, next]){
-        console.log("Hello there")
+      // next is optional, if async loading is needed.
+      angel.on(pattern, function(angel [, next]){
         // possibly call next(/* Error, Result optional */)
       })
     }
 <br />
 
-There are various scripts already - use the code ;)
+Existing scripts and abilities
 
+* [angelabilities](http://github.com/outbounder/angelabilities)
+* [angelscripts](http://github.com/outbounder/angelscripts)
 * [nodeapps](http://github.com/outbounder/angelscripts-nodeapps)
 * [cellcmds](http://github.com/outbounder/angelscripts-cellcmds)
-* [angelscripts](http://github.com/outbounder/angelscripts)
 
 ## Angel API
 
-### angel.cmdData
-
-Available only when angel is used within `angel.on` handler.
-
 ### angel.dna
 
-DNA instance, it contains boot configuration
+DNA instance, it contains boot configuration if any.
 
 ### angel.report
 
-### angel.loadScripts
+Reserved.
 
 ### angel.on(pattern, handler)
 
-* `pattern` : String with placeholders , like 'echo :value'
+* `pattern` : String with placeholders like 'echo :value' or RegExp
 * `handler` : `function(angel, next)`, where
-  * `angel` : Object containg the placeholder's values within `cmdData` property
-  * `next` : `function(err, result)` to be executed next with arguments
+  * `angel` : Angel Object clone
+    * `cmdData` : Object containing the resulted match of `pattern`
+  * `next` : `function(err, result)`
 
 ### angel.do(command [, handler])
 
-* `command` : String, like 'echo test' or with placeholders like 'echo {value}'
+* `command` : String like 'echo test' or with placeholders like 'echo {value}'
 * `handler` : `function(err, result)`, if not present, then `angel.do` will 
 return a reaction fn, see [reactions](https://github.com/vbogdanov/reactions) for details.
 
 ### angel.defaultDoHandler
 
+The default handler of angel's `do`. Override to provide different rendering of results.
+
 ### angel.react(command)
 
+Just executes `angel.do(command, angel.defaultDoHandler)`
 
-### angel.loadScripts(path, innerPath [, nextHandler])
+### angel.loadScripts(...)
+Load all scripts either by directory or by input array. 
+Note that all scripts will recieve a clone of `angel` instance.
 
-* all arguments except the last are parts of a path which is joined.
-* `nextHandler` : `function(err)`, called once all scripts are completely loaded.
+#### loadScripts(scriptsArray [, nextHandler])
+* scriptsArray : Array of strings which are full paths to scripts. 
+In case they are not full paths - `process.cwd()` will be prepended.
+* `nextHandler` : optional `function(err)`, called once all scripts are completely loaded.
 
-## boot sequences
+#### loadScripts(path, ... [, nextHandler])
+
+* all arguments except the last are parts of a path to a directory
+* `nextHandler` : optional `function(err)`, called once all scripts are completely loaded.
+
+## The idea, the concepts and the domain.
+
+### The Angel
+
+This is an Object. It is not singleton.
+
+Angel object has some really funky defaults:
+
+* once the object is constructed if no configuration is passed it will try to autoload some.
+* based on the boot configuration it will autoload and autoconstruct 
+  * any `organelles`
+  * any `abilities` 
+  * and finally any `scripts`
+* it will emit `ready` once all the above is done. It will always emit that unless there is 
+error found in any of the `organelles`, `abilities` or `scripts` autoloaded.
+
+Example configuration (also called just `DNA`)
+
+    {
+      "membrane": {
+        "SocketioServer": {
+          "source": "node_modules/organic-socketioserver"
+        }
+      },
+      "plasma": {
+        "Logger": {
+          "source": "node_modules/organic-logger"
+        }
+      },
+      
+      "abilities": [
+        "/full/path/to/script",
+        "relative/to/cwd/script",
+        "../funky/script",
+        "./another/one"
+      ],
+      "scripts": [
+        "/same/as/abilities/paths"
+      ]
+    }
+
+`membrane` and `plasma` configurations are not so often needed for cli based programs.
+
+### The abilities
+
+Angel abilities are functions attached to its `angel` instance. Any script can attach such
+abilities without messing with other scripts, thus scripts can have different versions of the same ability. Abilities are required before scripts on boot time and all of them receive the same angel instance. 
+
+### The scripts
+
+Angel scripts are chunks of logic which usually react on given command.
+Scripts recieve a cloned angel instance on boot time and everytime when `angel.loadScripts` is invoked. Further more handlers attached via `angel.on` within scripts also recieve a cloned instance of `angel`. That way any abilities are propagated from top to bottom but without messing 
+other handlers or scripts currently running. Using any globals in scripts is forbidden by default, still core global objects are suitable to be used.
+
+### boot sequences
 
     $ angel ./path/to/angel.json ...
       -> Load given angel.json as root dna
@@ -102,22 +187,22 @@ return a reaction fn, see [reactions](https://github.com/vbogdanov/reactions) fo
       -> react ...
 <br />
 
-## Organelles
+### Organelles
 
 See [node-organic](https://github.com/VarnaLab/node-organic/tree/master/docs#organelles)
 
-## Differences with ...
+### Differences with ...
 
-### Automation task runners and build tools.
+#### Automation task runners and build tools.
 
 Angel doesn't only runs predefined tasks, 
 it is a scriptable bot which can interact with the OS and with the User.
-Angel is also powerfully customizable(due `node-organic`) and tiny(265 loc).
+Angel is also powerfully customizable(due `node-organic`) and tiny(283 loc).
 
-### irc/chat/web/commandline bots 
+#### irc/chat/web/commandline bots 
 
 Angel doesn't only answers questions and plays quizes,
-it can speak and do os, http, tcp, commandline tasks and
+it can speak and do `os`, `http`, `tcp`, `commandline` tasks and
 more or less to help in day-to-day development activities,
 especially when scripted properly.
 
@@ -125,7 +210,7 @@ especially when scripted properly.
 
 First
 
-    // ./script.js
+    // ./time.js
     module.exports = function(angel){
       angel.on("do something for :topic", function(angel, next){
         if(angel.cmdData.topic == "time")
@@ -138,10 +223,10 @@ First
 <br />
 Second
 
-    // ./dna/angel.json
+    // ./angel.json
     {
       "scripts": [
-        "./script"
+        "./time"
       ]
     }
 
@@ -159,13 +244,19 @@ Third
 Finally at the command line
 
     $ npm install
-    $ node ./node_modules/.bin/angel ./dna/angel.json do something for time
+    $ node ./node_modules/.bin/angel ./angel.json do something for time
+
+<br />
+or
+
+    $ npm install
+    $ node ./node_modules/.bin/angel do something for time    
 
 <br />
 or
 
     $ npm install organic-angel -g
-    $ angel ./dna/angel.json do something for time    
+    $ angel ./angel.json do something for time    
 
 <br />
 or
@@ -184,9 +275,6 @@ http://underscorejs.org
 
 ## async
 https://github.com/caolan/async
-
-## npm
-http://npmjs.org
 
 ## string-template
 https://github.com/Matt-Esch/string-template
