@@ -1,4 +1,4 @@
-# Angel v0.2.2
+# Angel v0.2.4
 
 Simple as task runner, however with extra-ordinary abilities, 
 `angel` is a command line assistant.
@@ -28,11 +28,11 @@ Simple as task runner, however with extra-ordinary abilities,
     * angelscripts v0.0.5
     Would you like to engage update? (y/n)
 
-The above is example command line usage. Note that even 
-the above is not ready yet, it is absolutely possible.
+The above is **example** command line usage. Note that even 
+the above is not ready yet, it is possible even more ;)
 
-Angel is similar as concept to bots, like [hubot](http://hubot.github.com/), however 
-it is for command line. It can be mapped also as `the command line assistant`.
+Angel is derrives as concept from `bots`, like [hubot](http://hubot.github.com/). 
+However it is for command line. It can be mapped also as `the command line assistant`.
 
 ## Scripts and Abilities syntax
 

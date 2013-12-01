@@ -96,7 +96,14 @@ module.exports.prototype.clone = function(){
 
 module.exports.prototype.on = function(pattern, handler) {
   var self = this
-  this.reactor.on(pattern, function(cmdData, next){
+  return this.reactor.on(pattern, function(cmdData, next){
+    handler(_.extend(self.clone(), {cmdData: cmdData}), next)
+  })
+}
+
+module.exports.prototype.once = function(pattern, handler) {
+  var self = this
+  return this.reactor.once(pattern, function(cmdData, next){
     handler(_.extend(self.clone(), {cmdData: cmdData}), next)
   })
 }

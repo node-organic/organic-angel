@@ -1,6 +1,29 @@
 var async = require("async")
 var _ = require("underscore")
 
+var MicroApi = function(data, reactor){
+  this.data = data
+  this.reactor = reactor
+}
+
+_.extend(MicroApi.prototype,{
+  example: function(value){
+    this.data['example'] = value
+    return this
+  },
+  description: function(value) {
+    this.data['description'] = value
+    return this
+  },
+  set: function(key, value){
+    this.data[key] = value
+    return this
+  },
+  off: function(){
+    this.reactor.off(this.data)
+  }
+})
+
 module.exports = function(){
   this.$handlers = []
 }
@@ -8,6 +31,7 @@ module.exports = function(){
 module.exports.prototype.createReactionData = function(pattern, handler) {
   if(pattern instanceof RegExp)
     return {
+      id: _.uniqueId(),
       originalPattern: pattern,
       pattern: pattern,
       handler: handler
@@ -36,20 +60,33 @@ module.exports.prototype.createReactionData = function(pattern, handler) {
     }
 
   return {
-    originalPattern: pattern,
-    pattern: RegExp(pattern+"$"),
+    id: _.uniqueId(),
+    originalPattern: original,
+    pattern: RegExp("^"+pattern+"$"),
     optionParts: optionParts,
     optionalParts: optionalParts,
     handler: handler
   } 
 }
 
+module.exports.prototype.off = function(data) {
+  for(var i = 0;i<this.$handlers.length; i++)
+    if(data.id == this.$handlers[i].id) {
+      this.$handlers.splice(i, 1)
+      i -= 11
+    }
+}
+
 module.exports.prototype.on = function(pattern, handler) {
-  this.$handlers.push(this.createReactionData(pattern, handler))
+  var data = this.createReactionData(pattern, handler)
+  this.$handlers.push(data)
+  return new MicroApi(data, this)
 }
 
 module.exports.prototype.once = function(pattern, handler) {
-  this.$handlers.push(_.extend(this.createReactionData(pattern, handler), {once: true}))
+  var data = _.extend(this.createReactionData(pattern, handler), {once: true})
+  this.$handlers.push(data)
+  return new MicroApi(data, this)
 }
 
 module.exports.prototype.do = function(input, next) {
