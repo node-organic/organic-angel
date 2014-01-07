@@ -1,6 +1,7 @@
 var fs = require('fs')
 var path = require("path")
 var async = require('async')
+var home = require("home-dir")
 
 module.exports = function(contextFn){
   this.contextFn = contextFn
@@ -8,16 +9,23 @@ module.exports = function(contextFn){
 
 module.exports.prototype.loadScript = function(script, next) {
   var self = this
-  if(script.indexOf(".") === 0)
-    script = path.join(process.cwd(), script)
-  if(script.indexOf("/") !== 0 && script.indexOf(":") !== 1)
-    script = path.join(process.cwd(), "node_modules", script)
-  var m = require(script)
-  if(m.length == 2)
-    return m(this.contextFn(), next)
-  process.nextTick(function(){
+  var scriptLocations = [
+    path.join(process.cwd(), script),
+    path.join(process.cwd(), "node_modules", script),
+    path.join(path.dirname(process.env["NVM_BIN"] || ""), "lib", "node_modules", script),
+    path.join(home(), "angel_modules", script),
+    path.join(home(), "angel_modules", "node_modules", script),
+    script
+  ]
+  async.detect(scriptLocations, fs.exists, function(found){
+    if(!found) { console.warn(script+" not found in "+scriptLocations); return next() }
+    var m = require(found) 
+    // if exported func is async reaction (context, next)
+    if(m.length == 2) 
+      return m(self.contextFn(), next)
+    // otherwise invoke it directly and pass forward
     m(self.contextFn())
-    next()  
+    next()
   })
 }
 

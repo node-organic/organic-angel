@@ -3,13 +3,21 @@ var path = require("path");
 var fs = require("fs");
 var async = require("async")
 var _ = require("underscore")
+var home = require("home-dir")
 var format = require("string-template")
 var Reactor = require("./src/reactor")
 var Loader = require("./src/loader")
 
 module.exports = function Angel(dna){
   var self = this
-  
+  var sources = [ 
+    path.join(process.cwd(), "angel.json"), 
+    path.join(process.cwd(), "dna", "angel.json"),
+    path.join(process.cwd(), "dna"),
+    path.join(home(), "angel.json"),
+    path.join(home(), "angel", "dna")
+  ]
+
   this.plasma = new organic.Plasma();
   this.reactor = new Reactor()
   this.abilities = new Loader(function(){
@@ -20,15 +28,13 @@ module.exports = function Angel(dna){
   })
 
   if(!dna) {
-    fs.exists(path.join(process.cwd(), "angel.json"), function(exists){
-      if(exists)
-        self.loadDnaByPath(path.join(process.cwd(), "angel.json"), function(dna){
+    async.detect(sources, fs.exists, function(found){
+      if(found)
+        self.loadDnaByPath(found, function(dna){
           self.start(dna)
         })
       else
-        self.loadDnaByPath(path.join(process.cwd(), "dna"), function(dna){
-          self.start(dna)
-        })
+        self.start()
     })
   } else
   if(typeof dna == "string") {
