@@ -37,26 +37,15 @@ module.exports.prototype.createReactionData = function(pattern, handler) {
       handler: handler
     }
 
-  var placeholderPattern = /:([a-zA-Z0-9\\\(\)\|\.\*\]\[\?=]+)/g
+  var placeholderPattern = /:(\w+)\b/g
   var optionParts = []
   var original = pattern
   var m = pattern.match(placeholderPattern)
-  var optionalParts = 0
   if(m)
     for(var i = 0; i<m.length; i++) {
       var placeholder = m[i]
-      if(placeholder.indexOf("?") == placeholder.length-1) {
-        placeholder = placeholder.substr(0, placeholder.length-1)
-        optionalParts += 1
-      }
-      if(placeholder.match(/\(*.\)/)) {
-        var mm = placeholder.match(/(.*)\(/)[1].substr(1)
-        optionParts.push(mm)
-        pattern = pattern.replace(/ :([a-zA-Z0-9\?]+)\(/, "\\s?(")  
-      } else {
-        optionParts.push(placeholder.substr(1))
-        pattern = pattern.replace(" "+placeholder, "\\s?([a-zA-Z0-9/\\\\-_.\\+;:=\\+\\-~\\(\\)]+)")
-      }
+      optionParts.push(placeholder.substr(1))
+      pattern = pattern.replace(placeholder, "(\\w+)")
     }
 
   return {
@@ -64,7 +53,6 @@ module.exports.prototype.createReactionData = function(pattern, handler) {
     originalPattern: original,
     pattern: RegExp("^"+pattern+"$"),
     optionParts: optionParts,
-    optionalParts: optionalParts,
     handler: handler
   } 
 }

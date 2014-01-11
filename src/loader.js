@@ -18,13 +18,17 @@ module.exports.prototype.loadScript = function(script, next) {
     script
   ]
   async.detect(scriptLocations, fs.exists, function(found){
-    if(!found) { console.warn(script+" not found in "+scriptLocations); return next() }
-    var m = require(found) 
-    // if exported func is async reaction (context, next)
-    if(m.length == 2) 
-      return m(self.contextFn(), next)
-    // otherwise invoke it directly and pass forward
-    m(self.contextFn())
+    if(!found) { return next(new Error(script+" not found in "+scriptLocations)) }
+    try {
+      var m = require(found) 
+      // if exported func is async reaction (context, next)
+      if(m.length == 2) 
+        return m(self.contextFn(), next)
+      // otherwise invoke it directly and pass forward
+      m(self.contextFn())
+    } catch(err){
+      return next(err)
+    }
     next()
   })
 }
@@ -35,7 +39,7 @@ module.exports.prototype.load = function(){
   
   // loadScripts(Array([]), next)
   if(Array.isArray(input[0])) {
-    return async.each(input[0], function(f, n){
+    return async.eachSeries(input[0], function(f, n){
       self.loadScript(f, n)
     }, input[1])
   }
@@ -48,7 +52,7 @@ module.exports.prototype.load = function(){
     files = files.map(function(f){
       return path.join(rootDir, f)
     })
-    async.each(files, function(f, n){
+    async.eachSeries(files, function(f, n){
       if(path.extname(f) != ".js") return n()
       self.loadScript(f, n)
     }, next)

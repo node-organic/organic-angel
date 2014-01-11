@@ -1,7 +1,7 @@
 describe("angel.on with regex", function(){
   it("invokes properly", function(next){
     var Angel = require("../index")
-    var instance = new Angel()
+    var instance = new Angel(false)
     instance.on(/test me/, function(angel, next){
       expect(angel.cmdData).toBeDefined()
       next(null, angel)

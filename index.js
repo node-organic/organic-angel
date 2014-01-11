@@ -27,6 +27,9 @@ module.exports = function Angel(dna){
     return self.clone()
   })
 
+  if(dna === false)
+    return self.start()
+
   if(!dna) {
     async.detect(sources, fs.exists, function(found){
       if(found)
