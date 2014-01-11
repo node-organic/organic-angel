@@ -45,7 +45,7 @@ module.exports.prototype.createReactionData = function(pattern, handler) {
     for(var i = 0; i<m.length; i++) {
       var placeholder = m[i]
       optionParts.push(placeholder.substr(1))
-      pattern = pattern.replace(placeholder, "(\\w+)")
+      pattern = pattern.replace(placeholder, "(\\S+)")
     }
 
   return {
