@@ -153,38 +153,36 @@ other handlers or scripts currently running. Using any globals in scripts is for
 
 ### boot sequences
 
-    $ angel ./path/to/angel.json ...
-      -> Load given angel.json as root dna
-      -> merge `index.json` to root dna
-      -> construct dna.plasma
-      -> construct dna.membrane
-      -> load `dna.abilities`
-      -> load `dna.scripts`
-      -> react ...
-<br />
-
-    $ angel ./path/to/angel/dir/ ...
-      -> Load all `.json` files recusively
+    $ angel <path> ...
+      -> Load given path as root dna
       -> use dna.angel or just dna as root configuration
       -> merge `index.json` to root dna
       -> construct dna.plasma
       -> construct dna.membrane
       -> load `dna.abilities`
       -> load `dna.scripts`
-      -> react ...
+      -> react on ...
 <br />
 
     $ cd ./directory
     $ angel ...
-      -> try to load `./angel.json` if not 
-        -> try to load all `.json` files recursively in `./dna`
-        -> use dna.angel or just dna as root configuration
-        -> merge `index.json` to root dna
+      -> try to load configuration from `sources`
+      -> use dna.angel or just dna as root configuration
+      -> merge `index.json` to root dna
       -> construct dna.plsma
       -> construct dna.memberne
       -> load `dna.abilities`
       -> load `dna.scripts`
-      -> react ...
+      -> react on ...
+
+#### `default sources`
+
+  * path.join(process.cwd(), "angel.json"), 
+  * path.join(process.cwd(), "dna", "angel.json"),
+  * path.join(process.cwd(), "dna"),
+  * path.join(home(), "angel.json"),
+  * path.join(home(), "angel", "dna")
+  
 <br />
 
 ### Organelles
