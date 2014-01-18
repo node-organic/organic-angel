@@ -2,9 +2,9 @@ describe("cli", function(){
   var exec = require("child_process").exec
 
   var run = function(prefix, next) {
-    exec(prefix+" script echo", function (error, stdout, stderr) {
+    exec(prefix+" script echo | cat", function (error, stdout, stderr) {
       expect(error).toBe(null)
-      expect(stdout).toBe('echo\n')
+      expect(stdout).toBe('echo')
       expect(stderr).toBe('')
       next()
     })

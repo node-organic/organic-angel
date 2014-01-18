@@ -17,7 +17,7 @@ module.exports.prototype.loadScript = function(script, next) {
     path.join(home(), "angel_modules", "node_modules", script),
     script
   ]
-  async.detect(scriptLocations, fs.exists, function(found){
+  async.detectSeries(scriptLocations, fs.exists, function(found){
     if(!found) { return next(new Error(script+" not found in "+scriptLocations)) }
     try {
       var m = require(found) 

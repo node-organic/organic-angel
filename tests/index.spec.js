@@ -50,7 +50,7 @@ describe("Angel", function(){
         scripts: [__dirname+"/data/script.js"]
       })
       instance.plasma.on("ready", function(){
-        instance.do("script test", function(err, result){
+        instance.do("callback test", function(err, result){
           expect(result).toBe("test")
           next()
         })
@@ -63,7 +63,7 @@ describe("Angel", function(){
       instance = new Angel(false)
       instance.plasma.on("ready", function(){
         instance.scripts.load(__dirname, "data", function(){
-          instance.do("script test", function(err, result){
+          instance.do("callback test", function(err, result){
             expect(result).toBe("test")
             next()
           })  

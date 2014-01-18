@@ -31,7 +31,7 @@ module.exports = function Angel(dna){
     return self.start()
 
   if(!dna) {
-    async.detect(sources, fs.exists, function(found){
+    async.detectSeries(sources, fs.exists, function(found){
       if(found)
         self.loadDnaByPath(found, function(dna){
           self.start(dna)
@@ -125,28 +125,7 @@ module.exports.prototype.do = function(input, next) {
   }
 }
 
-module.exports.prototype.react = function(input) {
-  this.do(input, this.defaultDoHandler)
-}
-
-module.exports.prototype.defaultDoHandler = function(err, result){
-  if(err) {
-    console.error(err)
-    return process.exit(1)
-  }
-  if(result && result.stdout && result.stderr && result.on) {
-    result.stdout.pipe(process.stdout)
-    result.stderr.pipe(process.stderr)
-    result.on("close", function(code){
-      process.exit(code)
-    })
-  }
-  if(typeof result == "string")
-    process.stdout.write(result+"\n")
-  else
-    process.stdout.write(JSON.stringify(result, function(key, value){
-      if(value && typeof value == "object" && value.pid)
-        return {pid: value.pid};
-      return value;
-    }, 2)+"\n")
+module.exports.prototype.render = function() {
+  for(var i = 0; i<arguments.length; i++)
+    process.stdout.write(arguments[i])
 }
