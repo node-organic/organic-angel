@@ -125,7 +125,9 @@ module.exports.prototype.do = function(input, next) {
   }
 }
 
-module.exports.prototype.render = function() {
-  for(var i = 0; i<arguments.length; i++)
-    process.stdout.write(arguments[i])
+module.exports.prototype.render = function(err, data) {
+  if(err)
+    console.error(err, data)
+  else
+    console.log(data)
 }
