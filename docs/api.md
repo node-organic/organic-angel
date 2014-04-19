@@ -1,3 +1,12 @@
+## Scripts and Abilities syntax
+
+    module.exports = function(angel [, next]) {
+      // next is optional, if async loading is needed.
+      angel.on(pattern, function(angel [, next]){
+        // possibly call next(/* Error, Result optional */)
+      })
+    }
+    
 ## Angel API
 
 ### angel.dna
@@ -53,3 +62,7 @@ In case they are not full paths - `process.cwd()` will be prepended.
 
 * all arguments except the last are parts of a path to a directory
 * `nextHandler` : optional `function(err)`, called once all scripts are completely loaded.
+
+#### loadScript(path, nextHandler)
+
+Load script at given path.

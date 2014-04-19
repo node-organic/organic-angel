@@ -8,12 +8,15 @@ var format = require("string-template")
 var Reactor = require("./src/reactor")
 var Loader = require("./src/loader")
 
+var resolveArrayOverrides = require("resolve-array-overrides")
+var resolveReferences = require("organic-dna-resolvereferences")
+
+
 module.exports = function Angel(dna){
   var self = this
   var sources = [ 
-    path.join(process.cwd(), "angel.json"), 
-    path.join(process.cwd(), "dna", "angel.json"),
     path.join(process.cwd(), "dna"),
+    path.join(process.cwd(), "angel.json"),
     path.join(home(), "angel.json"),
     path.join(home(), "angel", "dna")
   ]
@@ -71,8 +74,12 @@ module.exports.prototype.loadDnaByPath = function(p, next) {
 
 module.exports.prototype.start = function(dna){
   dna = dna instanceof organic.DNA?dna:new organic.DNA(dna)
-  if(dna.index)
+  if(dna.index) {
+    resolveArrayOverrides(dna, "index")
     dna.mergeBranchInRoot("index")
+  }
+  resolveReferences(dna)
+
   organic.Cell.call(this, dna);
   
   this.dna = dna
@@ -89,6 +96,10 @@ module.exports.prototype.start = function(dna){
       })  
     })
   })
+}
+
+module.exports.prototype.loadScript = function(script, done) {
+  self.scripts.loadScript(script, done)
 }
 
 module.exports.prototype.loadScripts = function(){

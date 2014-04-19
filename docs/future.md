@@ -24,5 +24,4 @@
     * angelscripts v0.0.5
     Would you like to engage update? (y/n)
 
-The above is **example** command line usage. Note that even 
-the above is not ready yet, it is possible even more ;)
+The above is **example** command line usage.

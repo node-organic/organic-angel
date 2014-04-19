@@ -17,7 +17,9 @@
     "underscore": "1.5.2",
     "async": "0.2.9",
     "string-template": "0.1.3",
-    "home-dir": "~0.1.2"
+    "home-dir": "~0.1.2",
+    "organic-dna-resolvereferences": "https://github.com/outbounder/organic-dna-resolvereferences/archive/master.tar.gz",
+    "resolve-array-overrides": "0.0.1"
   },
   "devDependencies": {
     "jasmine-node": "1.11.0"

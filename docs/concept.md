@@ -58,6 +58,7 @@ other handlers or scripts currently running. Using any globals in scripts is for
       -> Load given path as root dna
       -> use dna.angel or just dna as root configuration
       -> merge `index.json` to root dna
+      -> resolveReferences(dna)
       -> construct dna.plasma
       -> construct dna.membrane
       -> load `dna.abilities`
@@ -70,6 +71,7 @@ other handlers or scripts currently running. Using any globals in scripts is for
       -> try to load configuration from `sources`
       -> use dna.angel or just dna as root configuration
       -> merge `index.json` to root dna
+      -> resolveReferences(dna)
       -> construct dna.plsma
       -> construct dna.memberne
       -> load `dna.abilities`
@@ -78,9 +80,8 @@ other handlers or scripts currently running. Using any globals in scripts is for
 
 #### `default sources`
 
-  * path.join(process.cwd(), "angel.json"), 
-  * path.join(process.cwd(), "dna", "angel.json"),
   * path.join(process.cwd(), "dna"),
+  * path.join(process.cwd(), "angel.json"), 
   * path.join(home(), "angel.json"),
   * path.join(home(), "angel", "dna")
   
