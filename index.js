@@ -63,10 +63,7 @@ module.exports.prototype.loadDnaByPath = function(p, next) {
       })
     } else {
       dna.loadDir(p, function(){
-        if(dna.angel)
-          next(dna.angel)
-        else
-          next(dna)
+        next(dna)
       })
     }
   })
@@ -74,12 +71,13 @@ module.exports.prototype.loadDnaByPath = function(p, next) {
 
 module.exports.prototype.start = function(dna){
   dna = dna instanceof organic.DNA?dna:new organic.DNA(dna)
+  resolveReferences(dna)
+  if(dna.angel)
+    dna = new organic.DNA(dna.angel)
   if(dna.index) {
     resolveArrayOverrides(dna, "index")
     dna.mergeBranchInRoot("index")
   }
-  resolveReferences(dna)
-
   organic.Cell.call(this, dna);
   
   this.dna = dna

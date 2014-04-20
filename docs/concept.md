@@ -56,9 +56,9 @@ other handlers or scripts currently running. Using any globals in scripts is for
 
     $ angel <path> ...
       -> Load given path as root dna
+      -> resolveReferences(dna)
       -> use dna.angel or just dna as root configuration
       -> merge `index.json` to root dna
-      -> resolveReferences(dna)
       -> construct dna.plasma
       -> construct dna.membrane
       -> load `dna.abilities`
@@ -69,9 +69,9 @@ other handlers or scripts currently running. Using any globals in scripts is for
     $ cd ./directory
     $ angel ...
       -> try to load configuration from `sources`
+      -> resolveReferences(dna)
       -> use dna.angel or just dna as root configuration
       -> merge `index.json` to root dna
-      -> resolveReferences(dna)
       -> construct dna.plsma
       -> construct dna.memberne
       -> load `dna.abilities`
