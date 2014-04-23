@@ -70,24 +70,26 @@ module.exports.prototype.loadDnaByPath = function(p, next) {
 }
 
 module.exports.prototype.start = function(dna){
-  dna = dna instanceof organic.DNA?dna:new organic.DNA(dna)
+  var dna = dna instanceof organic.DNA?dna:new organic.DNA(dna)
   resolveReferences(dna)
+  var angelDNA = dna
   if(dna.angel)
-    dna = new organic.DNA(dna.angel)
-  if(dna.index) {
-    resolveArrayOverrides(dna, "index")
-    dna.mergeBranchInRoot("index")
+    angelDNA = new organic.DNA(dna.angel)
+  if(angelDNA.index) {
+    resolveArrayOverrides(angelDNA, "index")
+    angelDNA.mergeBranchInRoot("index")
   }
-  organic.Cell.call(this, dna);
+  organic.Cell.call(this, angelDNA);
   
   this.dna = dna
+  this.angelDNA = angelDNA
   this.plasma.emit({"type": "build", branch: "membrane"})
   this.plasma.emit({"type": "build", branch: "plasma"})
 
   var self = this
-  self.abilities.load(dna.abilities || [], function(err){
+  self.abilities.load(angelDNA.abilities || [], function(err){
     if(err) return console.error(err)
-    self.scripts.load(dna.scripts || [], function(err){
+    self.scripts.load(angelDNA.scripts || [], function(err){
       if(err) return console.error(err)
       process.nextTick(function(){
         self.plasma.emit({type: "ready"})    
