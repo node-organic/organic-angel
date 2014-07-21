@@ -72,8 +72,8 @@ other handlers or scripts currently running. Using any globals in scripts is for
       -> resolveReferences(dna)
       -> use dna.angel or just dna as root configuration
       -> merge `index.json` to root dna
-      -> construct dna.plsma
-      -> construct dna.memberne
+      -> construct dna.plasma
+      -> construct dna.membrane
       -> load `dna.abilities`
       -> load `dna.scripts`
       -> react on ...
