@@ -13,10 +13,6 @@
 
 DNA instance, it contains boot configuration if any.
 
-### angel.report
-
-Reserved.
-
 ### angel.on(pattern, handler)
 
 * `pattern` : String with placeholders like 'echo :value' or RegExp

@@ -29,13 +29,16 @@ Example configuration (also called just `DNA`)
       },
       
       "abilities": [
-        "/full/path/to/script",
-        "relative/to/cwd/script",
-        "../funky/script",
-        "./another/one"
+        "/full/path/to/script.js",
+        "relative/to/cwd/script.js",
+        "../funky/script.js",
+        "./another/one.js"
       ],
       "scripts": [
-        "/same/as/abilities/paths"
+        "/full/path/to/script.js",
+        "relative/to/cwd/script.js",
+        "../funky/script.js",
+        "./another/one.js"
       ]
     }
 
@@ -55,14 +58,13 @@ other handlers or scripts currently running. Using any globals in scripts is for
 ### boot sequences
 
     $ angel <path> ...
-      -> Load given path as root dna
+      -> Load given <path> as root dna
       -> resolveReferences(dna)
-      -> use dna.angel or just dna as root configuration
-      -> merge `index.json` to root dna
-      -> construct dna.plasma
-      -> construct dna.membrane
-      -> load `dna.abilities`
-      -> load `dna.scripts`
+      -> use dna.angel.index || dna.angel || dna as angelDNA
+      -> construct angelDNA.plasma
+      -> construct angelDNA.membrane
+      -> load `angelDNA.abilities`
+      -> load `angelDNA.scripts` || `existing angels cripts found in node_modules`
       -> react on ...
 <br />
 
@@ -70,12 +72,11 @@ other handlers or scripts currently running. Using any globals in scripts is for
     $ angel ...
       -> try to load configuration from `sources`
       -> resolveReferences(dna)
-      -> use dna.angel or just dna as root configuration
-      -> merge `index.json` to root dna
-      -> construct dna.plsma
-      -> construct dna.memberne
-      -> load `dna.abilities`
-      -> load `dna.scripts`
+      -> use dna.angel.index || dna.angel || dna as angelDNA
+      -> construct angelDNA.plasma
+      -> construct angelDNA.membrane
+      -> load `angelDNA.abilities`
+      -> load `angelDNA.scripts` || `existing angels cripts found in node_modules`
       -> react on ...
 
 #### `default sources`
@@ -85,6 +86,16 @@ other handlers or scripts currently running. Using any globals in scripts is for
   * path.join(process.cwd(), "dna"),
   * path.join(home(), "angel.json"),
   * path.join(home(), "angel", "dna")
+
+#### `existing angel scripts found in node_modules`
+
+Angel autoloads all modules' entry points found under `cwd/node_modules` directory only if angelDNA.scripts is not present. That is done by iterating all top level modules having a `peerDependency` to `organic-angel`. Example `package.json` file:
+
+    {
+      "peerDependencies": {
+        "organic-angel": "0.2.10"
+      }
+    }
   
 <br />
 
