@@ -1,4 +1,4 @@
-describe("cli", function(){
+describe("cli with autoloaded scripts", function(){
   var exec = require("child_process").exec
 
   var run = function(prefix, next) {
@@ -17,17 +17,8 @@ describe("cli", function(){
     process.chdir(cwd)
   })
 
-  it("angel ./dna.json", function(next){
-    run("node ./bin/angel.js ./tests/data/dna.json", next)
-  })
-
-  it("angel in directory with dna/angel.json", function(next){
-    process.chdir(__dirname+"/data/dir")
-    run("node "+__dirname+"/../bin/angel.js", next)
-  })
-
-  it("angel in directory with angel.json", function(next){
-    process.chdir(__dirname+"/data/dir2")
+  it("works", function(next){
+    process.chdir(__dirname+"/data/autoload")
     run("node "+__dirname+"/../bin/angel.js", next)
   })
 })

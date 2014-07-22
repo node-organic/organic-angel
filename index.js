@@ -1,5 +1,7 @@
-var organic = require("organic");
-var path = require("path");
+var DNA = require("organic-dna")
+var Plasma = require("organic-plasma")
+
+var path = require("path")
 var fs = require("fs");
 var async = require("async")
 var _ = require("underscore")
@@ -8,20 +10,17 @@ var format = require("string-template")
 var Reactor = require("./lib/reactor")
 var Loader = require("./lib/loader")
 
-var resolveArrayOverrides = require("resolve-array-overrides")
-var resolveReferences = require("organic-dna-resolvereferences")
-
-
 module.exports = function Angel(dna){
   var self = this
   var sources = [ 
-    path.join(process.cwd(), "dna"),
+    path.join(process.cwd(), "dna", "angel", "index.json"),
+    path.join(process.cwd(), "dna", "angel.json"),
     path.join(process.cwd(), "angel.json"),
     path.join(home(), "angel.json"),
     path.join(home(), "angel", "dna")
   ]
 
-  this.plasma = new organic.Plasma();
+  this.plasma = new Plasma();
   this.reactor = new Reactor()
   this.abilities = new Loader(function(){
     return self
@@ -36,7 +35,8 @@ module.exports = function Angel(dna){
   if(!dna) {
     async.detectSeries(sources, fs.exists, function(found){
       if(found)
-        self.loadDnaByPath(found, function(dna){
+        self.loadDnaByPath(found, function(err, dna){
+          if(err) return console.error(err)
           self.start(dna)
         })
       else
@@ -44,7 +44,8 @@ module.exports = function Angel(dna){
     })
   } else
   if(typeof dna == "string") {
-    this.loadDnaByPath(dna, function(dna){
+    this.loadDnaByPath(dna, function(err, dna){
+      if(err) return console.error(err)
       self.start(dna)
     })
   }
@@ -53,49 +54,24 @@ module.exports = function Angel(dna){
 }
 
 module.exports.prototype.loadDnaByPath = function(p, next) {
-  var dna = new organic.DNA()
+  var dna = new DNA()
   fs.exists(p, function(found){
     if(!found) return next(dna)
 
     if(path.extname(p) == ".json") {
-      dna.loadFile(p, function(){
-        next(dna)
+      dna.loadFile(p, function(err){
+        next(err, dna)
       })
     } else {
-      dna.loadDir(p, function(){
-        next(dna)
+      dna.loadDir(p, function(err){
+        next(err, dna)
       })
     }
   })
 }
 
 module.exports.prototype.start = function(dna){
-  var dna = dna instanceof organic.DNA?dna:new organic.DNA(dna)
-  resolveReferences(dna)
-  var angelDNA = dna
-  if(dna.angel)
-    angelDNA = new organic.DNA(dna.angel)
-  if(angelDNA.index) {
-    resolveArrayOverrides(angelDNA, "index")
-    angelDNA.mergeBranchInRoot("index")
-  }
-  organic.Cell.call(this, angelDNA);
-  
-  this.dna = dna
-  this.angelDNA = angelDNA
-  this.plasma.emit({"type": "build", branch: "membrane"})
-  this.plasma.emit({"type": "build", branch: "plasma"})
-
-  var self = this
-  self.abilities.load(angelDNA.abilities || [], function(err){
-    if(err) return console.error(err)
-    self.scripts.load(angelDNA.scripts || [], function(err){
-      if(err) return console.error(err)
-      process.nextTick(function(){
-        self.plasma.emit({type: "ready"})    
-      })  
-    })
-  })
+  require("./boot").call(this, dna)
 }
 
 module.exports.prototype.loadScript = function(script, done) {

@@ -80,7 +80,8 @@ other handlers or scripts currently running. Using any globals in scripts is for
 
 #### `default sources`
 
-  * path.join(process.cwd(), "dna"),
+  * path.join(process.cwd(), "dna", "angel", "index.json"),
+  * path.join(process.cwd(), "dna", "angel.json"),
   * path.join(process.cwd(), "angel.json"), 
   * path.join(home(), "angel.json"),
   * path.join(home(), "angel", "dna")
