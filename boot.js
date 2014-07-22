@@ -63,12 +63,16 @@ module.exports = function(dna){
   if(process.env.CELL_MODE)
     fold(dna, process.env.CELL_MODE)
 
-  var nucleus = new Nucleus(self.plasma, dna)
+  if(dna.angel)
+    this.angelDNA = dna.angel.index || dna.angel
+  else
+    this.angelDNA = dna
+
+  var nucleus = new Nucleus(self.plasma, this.angelDNA)
   self.plasma.on("build", function(c, next){
     nucleus.build(c, next)
   })
   
-  this.angelDNA = dna
   if(this.angelDNA.membrane)
     this.plasma.emit({"type": "build", branch: "membrane"})
   if(this.angelDNA.plasma)

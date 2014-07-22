@@ -13,9 +13,9 @@ var Loader = require("./lib/loader")
 module.exports = function Angel(dna){
   var self = this
   var sources = [ 
-    path.join(process.cwd(), "dna", "angel", "index.json"),
     path.join(process.cwd(), "dna", "angel.json"),
     path.join(process.cwd(), "angel.json"),
+    path.join(process.cwd(), "dna"),
     path.join(home(), "angel.json"),
     path.join(home(), "angel", "dna")
   ]
