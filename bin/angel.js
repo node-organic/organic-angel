@@ -5,10 +5,13 @@ var Angel = require("../index");
 
 if(!module.parent) {
   var argv = process.argv.splice(2)
-  fs.exists(path.join(process.cwd(), argv[0]), function(found){
+  var dnaPath = path.join(process.cwd(), argv[0])
+  fs.exists(dnaPath, function(foundDNA){
     var instance
-    if(found)
-      instance = new Angel(argv.shift())
+    if(foundDNA) {
+      argv.shift() // exclude found dna path
+      instance = new Angel(dnaPath)
+    }
     else
       instance = new Angel()
     instance.plasma.on("ready", function(){
