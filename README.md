@@ -1,4 +1,4 @@
-# Angel v0.2.9
+# Angel v0.2.10
 
 Simple as task runner, however with extra-ordinary abilities, 
 `angel` is a command line assistant.
@@ -41,15 +41,6 @@ Existing scripts and abilities
       "scripts": [
         "./time.js"
       ]
-    }
-
-<br />
-### 3. create `./package.json` file
-
-    {
-      "dependencies": {
-        "organic-angel": "0.2.8"
-      }
     }
 
 <br />
