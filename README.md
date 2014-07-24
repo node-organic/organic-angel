@@ -13,13 +13,16 @@ Docs
 * [Roadmap](/docs/future.md)
 
 
-Existing scripts and abilities
-
+Existing abilities
 * [angelabilities](http://github.com/outbounder/angelabilities)
-* [angelscripts](http://github.com/outbounder/angelscripts)
+ 
+
+Existing scripts
+* [help](http://github.com/outbounder/angelscripts-help)
 * [nodeapps](http://github.com/outbounder/angelscripts-nodeapps)
 * [cellcmds](http://github.com/outbounder/angelscripts-cellcmds)
 * [generate](https://github.com/outbounder/angelscripts-generate)
+* [reactions](http://github.com/outbounder/angelscripts-reactions)
 
 ## example in `directory/myproject`
 
