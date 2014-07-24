@@ -93,7 +93,7 @@ Angel autoloads all modules' entry points found under `cwd/node_modules` directo
 
     {
       "peerDependencies": {
-        "organic-angel": "0.2.10"
+        "organic-angel": "0.2.x"
       }
     }
   

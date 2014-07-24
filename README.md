@@ -1,4 +1,4 @@
-# Angel v0.2.10
+# Angel v0.2.11
 
 Simple as task runner, however with extra-ordinary abilities, 
 `angel` is a command line assistant.
