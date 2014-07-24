@@ -8,7 +8,7 @@ if(!module.parent) {
   var dnaPath = path.join(process.cwd(), argv[0])
   fs.exists(dnaPath, function(foundDNA){
     var instance
-    if(foundDNA) {
+    if(foundDNA && path.extname(dnaPath) == ".json") {
       argv.shift() // exclude found dna path
       instance = new Angel(dnaPath)
     }
