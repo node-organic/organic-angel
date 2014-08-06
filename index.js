@@ -75,7 +75,7 @@ module.exports.prototype.start = function(dna){
 }
 
 module.exports.prototype.loadScript = function(script, done) {
-  self.scripts.loadScript(script, done)
+  this.scripts.loadScript(script, done)
 }
 
 module.exports.prototype.loadScripts = function(){
@@ -113,8 +113,6 @@ module.exports.prototype.do = function(input, next) {
 }
 
 module.exports.prototype.render = function(err, data) {
-  if(err)
-    console.error(err, data)
-  else
-    console.log(data)
+  if(err) return console.error(err)
+  console.log(data)
 }
