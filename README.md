@@ -15,6 +15,7 @@ Docs
 
 Existing abilities
 * [angelabilities](http://github.com/outbounder/angelabilities)
+* [angelabilities-grunt](http://github.com/outbounder/angelabilities-grunt)
  
 
 Existing scripts
