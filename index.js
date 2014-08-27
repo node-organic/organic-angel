@@ -1,4 +1,5 @@
-var DNA = require("organic-dna")
+var DNA = require("organic").DNA
+var DNAloader = require("organic-dna-fsloader")
 var Plasma = require("organic-plasma")
 
 var path = require("path")
@@ -59,11 +60,11 @@ module.exports.prototype.loadDnaByPath = function(p, next) {
     if(!found) return next(dna)
 
     if(path.extname(p) == ".json") {
-      dna.loadFile(p, function(err){
+      DNAloader.loadFile(dna, p, function(err){
         next(err, dna)
       })
     } else {
-      dna.loadDir(p, function(err){
+      DNAloader.loadDir(dna, p, function(err){
         next(err, dna)
       })
     }
@@ -113,6 +114,12 @@ module.exports.prototype.do = function(input, next) {
 }
 
 module.exports.prototype.render = function(err, data) {
-  if(err) return console.error(err)
-  console.log(data)
+  if(err) { 
+    console.error(err); 
+    return process.exit(1) 
+  }
+  if(data) {
+    process.stdout.write(data)
+    process.stdout.write("\n")
+  }
 }

@@ -15,6 +15,9 @@ if(!module.parent) {
     else
       instance = new Angel()
     instance.plasma.on("ready", function(){
+      instance.on("version", function(angel, next){
+        next(null, require(path.join(__dirname, "../package.json")).version)
+      })
       instance.do(argv.join(" "), instance.render)
     })
   })

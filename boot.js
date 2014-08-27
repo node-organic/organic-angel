@@ -1,10 +1,13 @@
 var path = require("path")
 var fs = require("fs")
 
-var DNA = require("organic-dna")
+var DNA = require("organic").DNA
+var loadDir = require("organic-dna-fsloader").loadDir
+var selectBranch = require("organic-dna-branches").selectBranch
 var Nucleus = require("organic-nucleus")
 var resolveReferences = require("organic-dna-resolvereferences")
 var fold = require("organic-dna-fold")
+
 
 var async = require("async")
 
@@ -53,30 +56,16 @@ var findAngelScriptModules = function(filter, done) {
   })
 }
 
-var loadScripts = function(next){
-  if(this.angelDNA.scripts) {
-    this.scripts.load(this.angelDNA.scripts, next)
-  } else {
-    var self = this
-    findAngelScriptModules(filterScripts, function(err, scriptPaths){
-      if(err) return next(err)
-      self.angelDNA.scripts = scriptPaths
-      self.scripts.load(self.angelDNA.scripts, next)
-    })
-  }
-}
-
-var loadAbilities = function(next){
-  if(this.angelDNA.abilities) {
-    this.abilities.load(this.angelDNA.abilities, next)
-  } else {
-    var self = this
-    findAngelScriptModules(filterAbilities, function(err, abilitiesPaths){
-      if(err) return next(err)
-      self.angelDNA.abilities = abilitiesPaths
-      self.abilities.load(self.angelDNA.abilities, next)
-    })
-  }
+var loadModules = function(loader, dnaProperty, moduleFilter, next){
+  var self = this
+  findAngelScriptModules(moduleFilter, function(err, paths){
+    if(err) return next(err)
+    if(self.angelDNA[dnaProperty])
+      self.angelDNA[dnaProperty] = self.angelDNA[dnaProperty].concat(paths)
+    else
+      self.angelDNA[dnaProperty] = paths
+    loader.load(self.angelDNA[dnaProperty], next)
+  })
 }
 
 module.exports = function(dna){
@@ -84,7 +73,7 @@ module.exports = function(dna){
   var dna = dna instanceof DNA?dna:new DNA(dna)
   
   if(process.env.CELL_MODE)
-    fold(dna, process.env.CELL_MODE)
+    fold(dna, selectBranch(dna, process.env.CELL_MODE))
 
   resolveReferences(dna)
 
@@ -104,10 +93,10 @@ module.exports = function(dna){
     this.plasma.emit({"type": "build", branch: "plasma"})
 
   this.dna = new DNA()
-  this.dna.loadDir(path.join(process.cwd(), "dna"), function(err){
-    loadAbilities.call(self, function(err){
+  loadDir(dna, path.join(process.cwd(), "dna"), function(err){
+    loadModules.call(self, self.abilities, "abilities", filterAbilities, function(err){
       if(err) return console.error(err)
-      loadScripts.call(self, function(err){
+      loadModules.call(self, self.scripts, "scripts", filterScripts, function(err){
         if(err) return console.error(err)
         process.nextTick(function(){
           self.plasma.emit({type: "ready"})    
