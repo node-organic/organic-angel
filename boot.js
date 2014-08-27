@@ -71,10 +71,9 @@ var loadModules = function(loader, dnaProperty, moduleFilter, next){
 module.exports = function(dna){
   var self = this
   var dna = dna instanceof DNA?dna:new DNA(dna)
-  
+
   if(process.env.CELL_MODE)
     fold(dna, selectBranch(dna, process.env.CELL_MODE))
-
   resolveReferences(dna)
 
   if(dna.angel)
@@ -93,7 +92,7 @@ module.exports = function(dna){
     this.plasma.emit({"type": "build", branch: "plasma"})
 
   this.dna = new DNA()
-  loadDir(dna, path.join(process.cwd(), "dna"), function(err){
+  loadDir(this.dna, path.join(process.cwd(), "dna"), function(err){
     loadModules.call(self, self.abilities, "abilities", filterAbilities, function(err){
       if(err) return console.error(err)
       loadModules.call(self, self.scripts, "scripts", filterScripts, function(err){
