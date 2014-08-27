@@ -118,8 +118,6 @@ module.exports.prototype.render = function(err, data) {
     console.error(err); 
     return process.exit(1) 
   }
-  if(data) {
-    process.stdout.write(data)
-    process.stdout.write("\n")
-  }
+  if(data)
+    console.log(data)
 }
