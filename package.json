@@ -1,6 +1,6 @@
 {
   "name": "organic-angel",
-  "version": "0.2.15",
+  "version": "0.2.16",
   "main": "index.js",
   "bin": {
     "angel": "./bin/angel.js"
@@ -18,7 +18,7 @@
     "home-dir": "~0.1.2",
     "organic": "0.2.0",
     "organic-dna-branches": "0.0.2",
-    "organic-dna-fold": "0.1.0",
+    "organic-dna-fold": "0.1.1",
     "organic-dna-fsloader": "0.0.2",
     "organic-dna-resolvereferences": "0.0.3",
     "organic-nucleus": "0.0.2",

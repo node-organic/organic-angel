@@ -1,7 +1,4 @@
-# Angel v0.2.15
-
-Simple as task runner, however with extra-ordinary abilities, 
-`angel` is a command line assistant.
+# Angel v0.2.16
 
 Angel is derrives as concept from `bots`, like [hubot](http://hubot.github.com/). 
 However it is for command line. It can be mapped also as `the command line assistant`.
@@ -24,6 +21,7 @@ Existing scripts
 * [cellcmds](http://github.com/outbounder/angelscripts-cellcmds)
 * [generate](https://github.com/outbounder/angelscripts-generate)
 * [reactions](http://github.com/outbounder/angelscripts-reactions)
+* [update dependencies](https://github.com/outbounder/angelscripts-update-deps)
 
 ## example in `directory/myproject`
 
