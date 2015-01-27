@@ -1,6 +1,6 @@
-# Angel v0.2.17
+# Angel v0.2.18
 
-Angel is derrives as concept from `bots`, like [hubot](http://hubot.github.com/). 
+Angel derrives as concept from `bots`, like [hubot](http://hubot.github.com/). 
 However it is for command line. It can be mapped also as `the command line assistant`.
 
 Docs

@@ -1,0 +1,5 @@
+{
+  "index": {
+    "scripts": ["../script.js"]
+  }
+}
