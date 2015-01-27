@@ -81,7 +81,8 @@ other handlers or scripts currently running. Using any globals in scripts is for
 
 #### `default sources`
 
-  * path.join(process.cwd(), "dna", process.env.CELL_MODE, "angel.json"),
+Angel uses the first found source for its bootstrap dna from:
+
   * path.join(process.cwd(), "dna", "angel.json"),
   * path.join(process.cwd(), "angel.json"), 
   * path.join(process.cwd(), "dna"),
