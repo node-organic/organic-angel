@@ -1,24 +1,27 @@
 #!/usr/bin/env node
 var fs = require("fs")
 var path = require("path")
-var Angel = require("../index");
 
-if(!module.parent) {
-  var argv = process.argv.splice(2)
-  var dnaPath = path.join(process.cwd(), argv[0])
-  fs.exists(dnaPath, function(foundDNA){
-    var instance
-    if(foundDNA && path.extname(dnaPath) == ".json") {
-      argv.shift() // exclude found dna path
-      instance = new Angel(dnaPath)
+
+var argv = process.argv.splice(2)
+var angelCellPath = path.join(process.cwd(), 'node_modules', 'organic-angel')
+fs.exists(angelCellPath, function(found){
+  if(!found) {
+    angelCellPath = path.join(__dirname, '../index')
+  }
+  var AngelCell = require(angelCellPath)
+  var angel = new AngelCell()
+  angel.start(function (err) {
+    if (err) {
+      console.error(err)
+      return process.exit(1)
     }
-    else
-      instance = new Angel()
-    instance.plasma.on("ready", function(){
-      instance.on("version", function(angel, next){
-        next(null, require(path.join(__dirname, "../package.json")).version)
-      })
-      instance.do(argv.join(" "), instance.render)
+    angel.do(argv.join(' '), function (err) {
+      if (err) {
+        console.error(err)
+        return process.exit(1)
+      }
+      process.exit(0)
     })
   })
-}
+})

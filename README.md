@@ -1,7 +1,7 @@
-# Angel v0.2.18
+# Angel v0.3.0
 
-Angel derrives as concept from `bots`, like [hubot](http://hubot.github.com/). 
-However it is for command line. It can be mapped also as `the command line assistant`.
+Angel derrives as concept from `bots`, like [hubot](http://hubot.github.com/).
+However it is for command line. It can be understood also as `command line assistant`.
 
 Docs
 
@@ -11,59 +11,40 @@ Docs
 
 
 Existing abilities
-* [angelabilities](http://github.com/outbounder/angelabilities)
-* [angelabilities-grunt](http://github.com/outbounder/angelabilities-grunt)
- 
+* [package-scripts](https://github.com/outbounder/angelabilities-package-scripts)
+
 
 Existing scripts
 * [help](http://github.com/outbounder/angelscripts-help)
-* [nodeapps](http://github.com/outbounder/angelscripts-nodeapps)
 * [cellcmds](http://github.com/outbounder/angelscripts-cellcmds)
-* [generate](https://github.com/outbounder/angelscripts-generate)
-* [reactions](http://github.com/outbounder/angelscripts-reactions)
-* [update dependencies](https://github.com/outbounder/angelscripts-update-deps)
 
 ## example in `directory/myproject`
 
-### 1. create `./time.js` file 
+### 0. install organic-angel
+
+    $ npm install organic-angel --save-dev
+
+### 1. install package-scripts ability
+
+    $ npm install angelabilities-package-scripts --save-dev
+
+### 2. create `./scripts/time.js` file
 
     module.exports = function(angel){
-      angel.on("do something for :topic", function(angel, next){
+      angel.on("what is the :topic", function(angel, next){
         if(angel.cmdData.topic == "time")
           console.log("The time is "+(new Date()).toString())
         else
-          console.error("sorry")
+          console.error("sorry, not recognized topic " + angel.cmdData.topic)
       })
     }
 
 <br />
-### 2. create `./angel.json` file
 
-    {
-      "scripts": [
-        "./time.js"
-      ]
-    }
-
-<br />
 ### Finally at the command line
 
-    $ npm install organic-angel -g
-    $ angel do something for time
+    $ node ./node_modules/.bin/angel what is the time
 
-# Thanks to
+or if you have angel global installed (`$ npm install organic-angel -g`)
 
-## organic
-https://github.com/varnalab/node-organic
-
-## underscore
-http://underscorejs.org
-
-## async
-https://github.com/caolan/async
-
-## string-template
-https://github.com/Matt-Esch/string-template
-
-## home-dir
-https://github.com/scottcorgan/home-dir
+    $ angel what is the time

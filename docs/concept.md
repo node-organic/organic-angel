@@ -4,15 +4,11 @@
 
 This is an Object. It is not singleton.
 
-Angel object has some really funky defaults:
+Angel object has some really useful defaults:
 
 * once the object is constructed if no configuration is passed it will try to autoload some.
-* based on the boot configuration it will autoload and autoconstruct 
-  * any `organelles`
-  * any `abilities` 
-  * and finally any `scripts`
-* it will emit `ready` once all the above is done. It will always emit that unless there is 
-error found in any of the `organelles`, `abilities` or `scripts` autoloaded.
+* based on the boot configuration it will autoload any `node_modules` scripts and abilities available
+* it will emit `autoloadReady` once all the above is done.
 
 Example configuration (also called just `DNA`)
 
@@ -26,81 +22,59 @@ Example configuration (also called just `DNA`)
         "Logger": {
           "source": "node_modules/organic-logger"
         }
-      },
-      
-      "abilities": [
-        "/full/path/to/script.js",
-        "relative/to/cwd/script.js",
-        "../funky/script.js",
-        "./another/one.js"
-      ],
-      "scripts": [
-        "/full/path/to/script.js",
-        "relative/to/cwd/script.js",
-        "../funky/script.js",
-        "./another/one.js"
-      ]
+      }
     }
-
-`membrane` and `plasma` configurations are not so often needed for cli based programs.
 
 ### The abilities
 
 Angel abilities are functions attached to its `angel` instance. Any script can attach such
-abilities without messing with other scripts, thus scripts can have different versions of the same ability. Abilities are required before scripts on boot time and all of them receive the same angel instance. 
+abilities without messing with other scripts, thus scripts can have different versions of the same ability. Abilities are required before scripts on boot time and all of them receive the same angel instance.
 
 ### The scripts
 
 Angel scripts are chunks of logic which usually react on given command.
-Scripts recieve a cloned angel instance on boot time and everytime when `angel.loadScripts` is invoked. Further more handlers attached via `angel.on` within scripts also recieve a cloned instance of `angel`. That way any abilities are propagated from top to bottom but without messing 
-other handlers or scripts currently running. Using any globals in scripts is forbidden by default, still core global objects are suitable to be used.
+Scripts recieve a cloned angel instance on boot time and everytime when `angel.scripts.load*` methods are invoked. Further more handlers attached via `angel.on` within scripts also recieve a cloned instance of `angel`. That way any abilities are propagated from top to bottom but without messing
+other handlers or scripts currently running.
 
-### boot sequences
-
-    $ angel <path> ...
-      -> Load given <path> as root dna
-      -> resolveReferences(dna) & fold(dna,process.env.CELL_MODE)
-      -> use dna.angel.index || dna.angel || dna as angelDNA
-      -> construct angelDNA.plasma
-      -> construct angelDNA.membrane
-      -> load - `angelDNA.abilities`
-      -> load - `angelDNA.scripts` || `existing angels cripts found in node_modules`
-      -> react on ...
-<br />
+### boot sequence
 
     $ cd ./directory
     $ angel ...
-      -> try to load configuration from `sources`
-      -> resolveReferences(dna) & fold(dna,process.env.CELL_MODE)
-      -> use dna.angel.index || dna.angel || dna as angelDNA
-      -> construct angelDNA.plasma
-      -> construct angelDNA.membrane
-      -> load - `angelDNA.abilities`
-      -> load - `angelDNA.scripts` || `existing angels cripts found in node_modules`
-      -> react on ...
+      -> try to load configuration from `angel.dnaSources`
+        -> resolveReferences(dna) & fold(dna,process.env.CELL_MODE)
+        -> construct Plasma & Nucleus
+      -> load any `/node_modules/angelabilities`
+      -> load any `/node_modules/angelscripts`
+      -> react on input
 
-#### `default sources`
+#### `default dnaSources`
 
 Angel uses the first found source for its bootstrap dna from:
 
-  * path.join(process.cwd(), "dna", "angel.json"),
-  * path.join(process.cwd(), "angel.json"), 
-  * path.join(process.cwd(), "dna"),
-  * path.join(home(), "angel.json"),
-  * path.join(home(), "angel", "dna")
+* path.join(process.cwd(), "dna", "angel.json"),
+* path.join(process.cwd(), "angel.json"),
+* path.join(home(), "angel.json"),
+* path.join(home(), "angel", "dna")
 
 #### `existing angel scripts found in node_modules`
 
-Angel autoloads all modules' entry points found under `cwd/node_modules` directory only if angelDNA.scripts is not present. That is done by iterating all top level modules having a `peerDependency` to `organic-angel`. Example `package.json` file:
+Angel autoloads all modules' entry points found under `cwd/node_modules` directory. That is done by iterating all top level modules having a `peerDependency` to `organic-angel` **and** named starting either with `angelscript` or `angelability`
+
+Example name:
+
+* `angelscripts-help`
+* `angelabilities-shell`
+
+Example `package.json` file:
 
     {
       "peerDependencies": {
         "organic-angel": "0.2.x"
       }
     }
-  
+
 <br />
 
-### Organelles
+### See more about organic
 
 See [node-organic](https://github.com/VarnaLab/node-organic/tree/master/docs#organelles)

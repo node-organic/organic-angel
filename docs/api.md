@@ -6,12 +6,19 @@
         // possibly call next(/* Error, Result optional */)
       })
     }
-    
+
 ## Angel API
 
 ### angel.dna
 
-DNA instance, it contains boot configuration if any.
+DNA instance, it contains boot configuration if any related to Angel itself
+
+#### angel DNA source list
+
+* path.join(process.cwd(), "dna", "angel.json"),
+* path.join(process.cwd(), "angel.json"),
+* path.join(home(), "angel.json"),
+* path.join(home(), "angel", "dna")
 
 ### angel.on(pattern, handler)
 
@@ -37,28 +44,29 @@ Example:
 
 ### angel.do(command [, handler])
 
-* `command` : String like 'echo test' or with placeholders like 'echo {value}'
-* `handler` : `function(err, result)`, if not present, then `angel.do` will 
-return a reaction fn, see [reactions](https://github.com/vbogdanov/reactions) for details.
+* `command` : String like 'echo test'
+* `handler` : `function(err, result)`
 
-### angel.render(err, data)
 
-The default handler of angel's `do`. Override to provide different rendering of results.
+### angel.loadScripts(scriptsArray [, nextHandler])
+Note that all scripts recieve a clone of `angel` instance.
 
-### angel.loadScripts(...)
-Load all scripts either by directory or by input array. 
-Note that all scripts will recieve a clone of `angel` instance.
+* `scriptsArray` : Array of strings which are paths to scripts.
+* `nextHandler` : optional `function(err)`, called once all scripts are loaded.
 
-#### loadScripts(scriptsArray [, nextHandler])
-* scriptsArray : Array of strings which are full paths to scripts. 
-In case they are not full paths - `process.cwd()` will be prepended.
-* `nextHandler` : optional `function(err)`, called once all scripts are completely loaded.
+#### loadScriptsByPath(directoryPath [, nextHandler])
+Note that all scripts recieve a clone of `angel` instance.
 
-#### loadScripts(path, ... [, nextHandler])
+* `directoryPath` : path to a directory containing `.js` files to be loaded as scripts
+* `nextHandler` : optional `function(err)`, called once all scripts are loaded.
 
-* all arguments except the last are parts of a path to a directory
-* `nextHandler` : optional `function(err)`, called once all scripts are completely loaded.
+#### loadScript(scriptPath, nextHandler)
+Note that scripts recieve a clone of `angel` instance.
 
-#### loadScript(path, nextHandler)
+Load script at given path using the following detect array:
 
-Load script at given path.
+* scriptPath,
+* path.join(process.cwd(), scriptPath),
+* path.join(process.cwd(), "node_modules", scriptPath),
+* path.join(home(), "angel_modules", scriptPath),
+* path.join(home(), "angel_modules", "node_modules", scriptPath)
