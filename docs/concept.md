@@ -52,6 +52,7 @@ other handlers or scripts currently running.
 Angel uses the first found source for its bootstrap dna from:
 
 * path.join(process.cwd(), "dna", "angel.json"),
+* path.join(process.cwd(), "dna", "angel"),
 * path.join(process.cwd(), "angel.json"),
 * path.join(home(), "angel.json"),
 * path.join(home(), "angel", "dna")

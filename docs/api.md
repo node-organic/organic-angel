@@ -11,14 +11,33 @@
 
 ### angel.dna
 
-DNA instance, it contains boot configuration if any related to Angel itself
+property having DNA instance related to Angel itself
 
 #### angel DNA source list
 
 * path.join(process.cwd(), "dna", "angel.json"),
+* path.join(process.cwd(), "dna", "angel"),
 * path.join(process.cwd(), "angel.json"),
 * path.join(home(), "angel.json"),
 * path.join(home(), "angel", "dna")
+
+### angel.autoloadDNA(handler)
+
+uses angel DNA source list to populate `angel.dna`  property
+
+### angel.start(handler)
+
+1. autoloads `angel.dna`
+2. constructs Nucleus providing organelles build support
+3. autoloads angel modules from `process.cwd() + '/node_modules'` folder
+
+### angel.clone()
+
+Returns cloned object of Angel instance keeping references to:
+
+* `angel.reactor`
+* `angel.scripts` loader
+* `angel.abilities` loader
 
 ### angel.on(pattern, handler)
 
@@ -27,6 +46,8 @@ DNA instance, it contains boot configuration if any related to Angel itself
   * `angel` : cloned Angel Object with `cmdData`
     * `cmdData` : Object containing the resulted match of `pattern`
   * `next` : optional `function(err, result)`
+
+* Returns `microApi` instance
 
 Example:
 
@@ -41,38 +62,43 @@ Example:
       console.log("You asked about "+angel.cmdData[1])
     })
 
+### angel.off(microApiInstance)
+
+`handler` won't be fired for `pattern` used in `angel.on` or `angel.once`
 
 ### angel.do(command [, handler])
 
 * `command` : String like 'echo test'
 * `handler` : `function(err, result)`
 
+#### angel.addDefaultHandler(handler)
 
-### angel.loadScripts(scriptsArray [, nextHandler])
-Note that all scripts recieve a clone of `angel` instance.
+Adds a default handler, will be invoked if none handler matched given `angel.do` input command
 
-* `scriptsArray` : Array of strings which are paths to scripts.
-* `nextHandler` : optional `function(err)`, called once all scripts are loaded.
+* `handler` : Function (input: String, done: Callback)
 
-#### loadScriptsByPath(directoryPath [, nextHandler])
-Note that all scripts recieve a clone of `angel` instance.
-
-* `directoryPath` : path to a directory containing `.js` files to be loaded as scripts
-* `nextHandler` : optional `function(err)`, called once all scripts are loaded.
-
-#### loadScript(scriptPath, nextHandler)
-Note that scripts recieve a clone of `angel` instance.
+#### .loadScript(scriptPath, handler)
+Either `angel.scripts` or `angel.abilities`
+Note that scripts receive a clone of `angel` instance.
 
 Load script at given path using the following detect array:
 
 * scriptPath,
 * path.join(process.cwd(), scriptPath),
 * path.join(process.cwd(), "node_modules", scriptPath),
-* path.join(home(), "angel_modules", scriptPath),
-* path.join(home(), "angel_modules", "node_modules", scriptPath)
+* path.join(home(), "angel", scriptPath),
+* path.join(home(), "angel", "scripts", scriptPath)
 
-#### addDefaultHandler(handler)
+### .loadScripts(scriptsArray [, handler])
+Either `angel.scripts` or `angel.abilities`
+Note that all scripts receive a clone of `angel` instance.
 
-Adds a default handler, will be invoked if none matched.
+* `scriptsArray` : Array of strings which are paths to scripts.
+* `handler` : optional `function(err)`, called once all scripts are loaded.
 
-* `handler` : Function (input: String, done: Callback)
+#### .loadScriptsByPath(directoryPath [, handler])
+Either `angel.scripts` or `angel.abilities`
+Note that all scripts receive a clone of `angel` instance.
+
+* `directoryPath` : path to a directory containing `.js` files to be loaded
+* `handler` : optional `function(err)`, called once all scripts are loaded.

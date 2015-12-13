@@ -1,7 +1,6 @@
 var path = require("path")
 var fs = require("fs");
 var async = require("async")
-var _ = require("underscore")
 var home = require("home-dir")
 
 var Plasma = require("organic-plasma")
@@ -15,6 +14,7 @@ module.exports = function Angel(){
   var self = this
   this.dnaSources = [
     path.join(process.cwd(), "dna", "angel.json"),
+    path.join(process.cwd(), "dna", "angel"),
     path.join(process.cwd(), "angel.json"),
     path.join(home(), "angel.json"),
     path.join(home(), "angel", "dna")
@@ -55,18 +55,33 @@ module.exports.prototype.start = function (done) {
       nucleus.build(c, next)
     })
 
-    require('./autoload-angel-modules').call(self, done)
+    require('./lib/autoload-angel-modules').call(self, done)
   })
 }
 
 module.exports.prototype.clone = function(){
-  return _.extend({}, this)
+  var cloned = {}
+  for (var key in this) {
+    cloned[key] = this[key]
+  }
+  return cloned
 }
 
 module.exports.prototype.on = function(pattern, handler) {
   var self = this
   return this.reactor.on(pattern, function(cmdData, next){
-    handler(_.extend(self.clone(), {cmdData: cmdData}), next)
+    var state = self.clone()
+    state.cmdData = cmdData
+    handler(state, next)
+  })
+}
+
+module.exports.prototype.once = function(pattern, handler) {
+  var self = this
+  return this.reactor.once(pattern, function(cmdData, next){
+    var state = self.clone()
+    state.cmdData = cmdData
+    handler(state, next)
   })
 }
 
@@ -74,11 +89,8 @@ module.exports.prototype.addDefaultHandler = function (handler) {
   return this.reactor.$defaultHandlers.push(handler)
 }
 
-module.exports.prototype.once = function(pattern, handler) {
-  var self = this
-  return this.reactor.once(pattern, function(cmdData, next){
-    handler(_.extend(self.clone(), {cmdData: cmdData}), next)
-  })
+module.exports.prototype.off = function (handlerMicroApi) {
+  return this.reactor.off(handlerMicroApi)
 }
 
 module.exports.prototype.do = function(input, next) {
