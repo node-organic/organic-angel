@@ -70,6 +70,10 @@ module.exports.prototype.on = function(pattern, handler) {
   })
 }
 
+module.exports.prototype.addDefaultHandler = function (handler) {
+  return this.reactor.$defaultHandlers.push(handler)
+}
+
 module.exports.prototype.once = function(pattern, handler) {
   var self = this
   return this.reactor.once(pattern, function(cmdData, next){

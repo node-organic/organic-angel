@@ -70,3 +70,9 @@ Load script at given path using the following detect array:
 * path.join(process.cwd(), "node_modules", scriptPath),
 * path.join(home(), "angel_modules", scriptPath),
 * path.join(home(), "angel_modules", "node_modules", scriptPath)
+
+#### addDefaultHandler(handler)
+
+Adds a default handler, will be invoked if none matched.
+
+* `handler` : Function (input: String, done: Callback)
