@@ -6,12 +6,38 @@
         // possibly call next(/* Error, Result optional */)
       })
     }
-    
+
 ## Angel API
 
 ### angel.dna
 
-DNA instance, it contains boot configuration if any.
+property having DNA instance related to Angel itself
+
+#### angel DNA source list
+
+* path.join(process.cwd(), "dna", "angel.json"),
+* path.join(process.cwd(), "dna", "angel"),
+* path.join(process.cwd(), "angel.json"),
+* path.join(home(), "angel.json"),
+* path.join(home(), "angel", "dna")
+
+### angel.autoloadDNA(handler)
+
+uses angel DNA source list to populate `angel.dna`  property
+
+### angel.start(handler)
+
+1. autoloads `angel.dna`
+2. constructs Nucleus providing organelles build support
+3. autoloads angel modules from `process.cwd() + '/node_modules'` folder
+
+### angel.clone()
+
+Returns cloned object of Angel instance keeping references to:
+
+* `angel.reactor`
+* `angel.scripts` loader
+* `angel.abilities` loader
 
 ### angel.on(pattern, handler)
 
@@ -20,6 +46,8 @@ DNA instance, it contains boot configuration if any.
   * `angel` : cloned Angel Object with `cmdData`
     * `cmdData` : Object containing the resulted match of `pattern`
   * `next` : optional `function(err, result)`
+
+* Returns `microApi` instance
 
 Example:
 
@@ -34,31 +62,43 @@ Example:
       console.log("You asked about "+angel.cmdData[1])
     })
 
+### angel.off(microApiInstance)
+
+`handler` won't be fired for `pattern` used in `angel.on` or `angel.once`
 
 ### angel.do(command [, handler])
 
-* `command` : String like 'echo test' or with placeholders like 'echo {value}'
-* `handler` : `function(err, result)`, if not present, then `angel.do` will 
-return a reaction fn, see [reactions](https://github.com/vbogdanov/reactions) for details.
+* `command` : String like 'echo test'
+* `handler` : `function(err, result)`
 
-### angel.render(err, data)
+#### angel.addDefaultHandler(handler)
 
-The default handler of angel's `do`. Override to provide different rendering of results.
+Adds a default handler, will be invoked if none handler matched given `angel.do` input command
 
-### angel.loadScripts(...)
-Load all scripts either by directory or by input array. 
-Note that all scripts will recieve a clone of `angel` instance.
+* `handler` : Function (input: String, done: Callback)
 
-#### loadScripts(scriptsArray [, nextHandler])
-* scriptsArray : Array of strings which are full paths to scripts. 
-In case they are not full paths - `process.cwd()` will be prepended.
-* `nextHandler` : optional `function(err)`, called once all scripts are completely loaded.
+#### .loadScript(scriptPath, handler)
+Either `angel.scripts` or `angel.abilities`
+Note that scripts receive a clone of `angel` instance.
 
-#### loadScripts(path, ... [, nextHandler])
+Load script at given path using the following detect array:
 
-* all arguments except the last are parts of a path to a directory
-* `nextHandler` : optional `function(err)`, called once all scripts are completely loaded.
+* scriptPath,
+* path.join(process.cwd(), scriptPath),
+* path.join(process.cwd(), "node_modules", scriptPath),
+* path.join(home(), "angel", scriptPath),
+* path.join(home(), "angel", "scripts", scriptPath)
 
-#### loadScript(path, nextHandler)
+### .loadScripts(scriptsArray [, handler])
+Either `angel.scripts` or `angel.abilities`
+Note that all scripts receive a clone of `angel` instance.
 
-Load script at given path.
+* `scriptsArray` : Array of strings which are paths to scripts.
+* `handler` : optional `function(err)`, called once all scripts are loaded.
+
+#### .loadScriptsByPath(directoryPath [, handler])
+Either `angel.scripts` or `angel.abilities`
+Note that all scripts receive a clone of `angel` instance.
+
+* `directoryPath` : path to a directory containing `.js` files to be loaded
+* `handler` : optional `function(err)`, called once all scripts are loaded.

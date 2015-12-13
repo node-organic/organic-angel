@@ -3,10 +3,8 @@ describe("Angel", function(){
   describe("with custom handlers", function(){
     var instance;
     beforeEach(function(next){
-      instance = new Angel(false)
-      instance.plasma.on("ready", function(){
-        next()
-      })
+      instance = new Angel()
+      next()
     })
 
     it("plain match", function(next){
@@ -43,30 +41,16 @@ describe("Angel", function(){
       })
     })
   })
-  describe("with predefined dna scripts", function(){
-    var instance;
-    it("constructs and starts", function(next){
-      instance = new Angel({
-        scripts: [__dirname+"/data/script.js"]
-      })
-      instance.plasma.on("ready", function(){
-        instance.do("callback test", function(err, result){
-          expect(result).toBe("test")
-          next()
-        })
-      })
-    })
-  })
   describe("with loading scripts dynamically", function(){
     var instance;
     it("constructs and starts", function(next){
-      instance = new Angel(false)
-      instance.plasma.on("ready", function(){
-        instance.scripts.load(__dirname, "data", function(){
-          instance.do("callback test", function(err, result){
-            expect(result).toBe("test")
-            next()
-          })  
+      instance = new Angel()
+      instance.scripts.loadScriptsByPath(__dirname+"/data/node_modules/angelscripts-echo", function(err){
+        expect(err).toBeFalsy()
+        instance.do("callback test", function(err, result){
+          expect(err).toBeFalsy()
+          expect(result).toBe("test")
+          next()
         })
       })
     })
