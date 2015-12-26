@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.2] - 2015-12-26
+### Added
+- backward compatibility support for organic-angel 0.2.x
+- support for `$ angel version` returning current angel instance version
+
 ## [0.3.1] - 2015-12-26
 ### Added
 - change log :)

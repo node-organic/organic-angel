@@ -1,4 +1,4 @@
-# Angel v0.3.1
+# Angel v0.3.2
 
 Angel derrives as concept from `bots`, like [hubot](http://hubot.github.com/).
 However it is for command line. It can be understood also as `command line assistant`.
@@ -9,10 +9,9 @@ Docs
 * [API](/docs/api.md)
 * [Roadmap](/docs/future.md)
 
-
 Existing abilities
 * [package-scripts](https://github.com/outbounder/angelabilities-package-scripts)
-
+* [shell-exec](https://github.com/outbounder/angelabilities-exec)
 
 Existing scripts
 * [help](http://github.com/outbounder/angelscripts-help)
