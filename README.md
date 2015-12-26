@@ -1,4 +1,4 @@
-# Angel v0.3.0
+# Angel v0.3.1
 
 Angel derrives as concept from `bots`, like [hubot](http://hubot.github.com/).
 However it is for command line. It can be understood also as `command line assistant`.

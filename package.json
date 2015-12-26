@@ -6,7 +6,10 @@
     "angel": "./bin/angel.js"
   },
   "scripts": {
-    "test": "jasmine-node ./tests/"
+    "test": "jasmine-node ./tests/",
+    "preversion": "npm test",
+    "release-patch": "npm version patch && npm publish",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
@@ -24,7 +27,7 @@
     "organic-plasma": "0.0.6"
   },
   "devDependencies": {
-    "jasmine-node": "1.11.0"
+    "jasmine-node": "1.14.5"
   },
   "license": "MIT",
   "description": "Angel derrives as concept from `bots`, like [hubot](http://hubot.github.com/). However it is for command line. It can be understood also as `command line assistant`.",
