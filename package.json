@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "async": "0.2.9",
+    "esm": "^3.2.25",
     "home-dir": "~0.1.2",
     "organic": "0.2.0",
     "organic-dna-branches": "0.0.2",
