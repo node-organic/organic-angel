@@ -2,10 +2,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## major.minor.patch - YYYY-MM-DD
-### Added
-### Changed
-### Removed
+## 0.5.0 - 2021-11-19
+
+### :warning: breaking change
+
+* angel api is changed and any angelscripts or abilities need to upgrade:
+  * angel.scripts & angel.abilities are not present, instead there is angel.loadScript(s)
+  * angel.dna is not present, instead self-load dna using 3rd party utilities
+
+### removed
+* automatic dna resolution
+
+### changed
+* replaced automatic script/ability loading to package.json's (dev)dependencies sourced list instead
+* rewrote the implementation with async/await
 
 ## 0.4.0 - 2019-09-17
 ### Added

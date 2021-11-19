@@ -1,0 +1,7 @@
+{
+  "name": "test",
+  "dependencies": {
+    "angelscripts-chat": "0.0.0",
+    "angelscripts-echo": "0.0.0"
+  }
+}

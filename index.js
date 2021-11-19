@@ -1,98 +1,113 @@
-var path = require("path")
-var fs = require("fs");
-var async = require("async")
-var home = require("home-dir")
+const path = require("path")
 
-var Plasma = require("organic-plasma")
-var Nucleus = require("organic-nucleus")
+const Plasma = require("organic-plasma")
+const Reactor = require("./lib/reactor")
+const esm = require('esm')
 
-var Reactor = require("./lib/reactor")
-var Loader = require("./lib/loader")
-var loadDNA = require('./lib/dna')
-
-module.exports = function Angel(){
-  var self = this
-  this.dnaSources = [
-    path.join(process.cwd(), "dna", "angel.json"),
-    path.join(process.cwd(), "dna", "angel"),
-    path.join(process.cwd(), "angel.json"),
-    path.join(home(), "angel.json"),
-    path.join(home(), "angel", "dna")
-  ]
-
-  this.plasma = new Plasma();
-  this.reactor = new Reactor()
-  this.abilities = new Loader(function(){
-    return self
-  })
-  this.scripts = new Loader(function(){
-    return self.clone()
-  })
-}
-
-module.exports.prototype.autoloadDNA = function(done){
-  var self = this
-  async.detectSeries(this.dnaSources, fs.exists, function(found){
-    if(found) {
-      loadDNA(found, function(err, dna){
-        if(err) return done(err)
-        self.dna = dna
-        done()
-      })
-    } else {
-      done()
+module.exports = class Angel {
+  constructor() {
+    this.plasma = new Plasma()
+    this.reactor = new Reactor()
+    this.env = {
+      cwd: process.cwd()
     }
-  })
-}
-
-module.exports.prototype.start = function (done) {
-  var self = this
-  self.autoloadDNA(function (err) {
-    if (err) return done(err)
-
-    var nucleus = new Nucleus(self.plasma, self.dna)
-    self.plasma.on("build", function(c, next){
-      nucleus.build(c, next)
-    })
-
-    require('./lib/autoload-angel-modules').call(self, done)
-  })
-}
-
-module.exports.prototype.clone = function(){
-  var cloned = {}
-  for (var key in this) {
-    cloned[key] = this[key]
   }
-  return cloned
-}
 
-module.exports.prototype.on = function(pattern, handler) {
-  var self = this
-  return this.reactor.on(pattern, function(cmdData, next){
-    var state = self.clone()
-    state.cmdData = cmdData
-    handler(state, next)
-  })
-}
+  async start () {
+    const packagejson = require(path.join(this.env.cwd, 'package.json'))
+    const deps = Object.assign({}, packagejson.dependencies, packagejson.devDependencies)
+    await this.loadDepModules(deps, 'angelabilit', this)
+    await this.loadDepModules(deps, 'angelscript', this.clone())
+    this.plasma.emit({ type: 'Ready' })
+  }
 
-module.exports.prototype.once = function(pattern, handler) {
-  var self = this
-  return this.reactor.once(pattern, function(cmdData, next){
-    var state = self.clone()
-    state.cmdData = cmdData
-    handler(state, next)
-  })
-}
+  async loadDepModules (deps, startingWith, context = this) {
+    for (let moduleName in deps) {
+      if (moduleName.startsWith(startingWith)) {
+        const script = path.join(this.env.cwd, 'node_modules', moduleName)
+        await this.loadScript(script, context)
+      }
+    }
+  }
 
-module.exports.prototype.addDefaultHandler = function (handler) {
-  return this.reactor.$defaultHandlers.push(handler)
-}
+  async loadScripts(scripts, context = this) {
+    for(let i = 0; i<scripts.length; i++) {
+      await this.loadScript(scripts[i], context)
+    }
+  }
 
-module.exports.prototype.off = function (handlerMicroApi) {
-  return this.reactor.off(handlerMicroApi)
-}
+  async loadScript(script, context = this) {
+    const m = esm(module)(script)
+    if (m.length === 1) {
+      await m(context)
+    } else {
+      return new Promise((resolve, reject) => {
+        m(context, function (err) {
+          if (err) return reject(err)
+          resolve()
+        })
+      })
+    }
+  }
 
-module.exports.prototype.do = function(input, next) {
-  this.reactor.do(input, next)
+  clone () {
+    const cloned = {}
+    for (const key in this) {
+      cloned[key] = this[key]
+    }
+    let methods = ['on', 'once', 'clone', 'loadScript', 'loadScripts', 'off', 'addDefaultHandler', 'do']
+    for (const m of methods) {
+      cloned[m] = this[m]
+    }
+    return cloned
+  }
+
+  on (pattern, handler) {
+    return this.reactor.on(pattern, async (cmdData) => {
+      const state = this.clone()
+      state.cmdData = cmdData
+      if (handler.length === 1) return handler(state)
+      return new Promise((resolve, reject) => {
+        handler(state, function (err, data) {
+          if (err) return reject(err)
+          resolve(data)
+        })
+      })
+    })
+  }
+
+  once (pattern, handler) {
+    return this.reactor.once(pattern, async (cmdData) => {
+      const state = this.clone()
+      state.cmdData = cmdData
+      if (handler.length === 1) return handler(state)
+      return new Promise((resolve, reject) => {
+        handler(state, function (err, data){
+          if (err) return reject(err)
+          resolve(data)
+        })
+      })
+    })
+  }
+
+  addDefaultHandler (handler) {
+    return this.reactor.$defaultHandlers.push(handler)
+  }
+
+  off (handlerMicroApi) {
+    return this.reactor.off(handlerMicroApi)
+  }
+
+  async do (input, next) {
+    try {
+      let r = await this.reactor.do(input)
+      next && next(null, r)
+      return r
+    } catch (e) {
+      next && next(e)
+      let err = new Error('failed ' + input)
+      err.origin = e
+      throw err
+    }
+  }
 }

@@ -43,16 +43,11 @@ describe("Angel", function(){
   })
   describe("with loading scripts dynamically", function(){
     var instance;
-    it("constructs and starts", function(next){
+    it("constructs and starts", async function(){
       instance = new Angel()
-      instance.scripts.loadScriptsByPath(__dirname+"/data/node_modules/angelscripts-echo", function(err){
-        expect(err).toBeFalsy()
-        instance.do("callback test", function(err, result){
-          expect(err).toBeFalsy()
-          expect(result).toBe("test")
-          next()
-        })
-      })
+      await instance.loadScript(__dirname+"/data/node_modules/angelscripts-echo")
+      let result = await instance.do("callback test")
+      expect(result).toBe("test")
     })
   })
 })

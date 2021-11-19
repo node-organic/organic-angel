@@ -6,7 +6,7 @@
     "angel": "./bin/angel.js"
   },
   "scripts": {
-    "test": "jasmine-node ./tests/",
+    "test": "jasmine",
     "preversion": "npm test",
     "release-patch": "npm version patch && npm publish",
     "release-minor": "npm version minor && npm publish",
@@ -15,34 +15,27 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/outbounder/organic-angel.git"
+    "url": "https://github.com/node-organic/organic-angel.git"
   },
   "dependencies": {
-    "async": "0.2.9",
+    "async": "^3.2.2",
     "esm": "^3.2.25",
-    "home-dir": "~0.1.2",
-    "organic": "0.2.0",
-    "organic-dna-branches": "0.0.2",
-    "organic-dna-fold": "0.1.1",
-    "organic-dna-fsloader": "0.0.2",
-    "organic-dna-resolvereferences": "0.0.3",
-    "organic-nucleus": "0.0.2",
-    "organic-plasma": "0.0.6"
+    "organic-plasma": "4.1.0"
   },
   "devDependencies": {
-    "jasmine-node": "1.14.5"
+    "jasmine": "3.10.0"
   },
   "license": "MIT",
-  "description": "Angel derrives as concept from `bots`, like [hubot](http://hubot.github.com/). However it is for command line. It can be understood also as `command line assistant`.",
+  "description": "Angel as concept derrives from `bots`. It can be understood also as `command line assistant`.",
   "bugs": {
-    "url": "https://github.com/outbounder/organic-angel/issues"
+    "url": "https://github.com/node-organic/organic-angel/issues"
   },
-  "homepage": "https://github.com/outbounder/organic-angel",
+  "homepage": "https://github.com/node-organic/organic-angel",
   "directories": {
-    "doc": "docs",
+    "docs": "docs",
     "lib": "lib",
     "bin": "bin",
-    "test": "tests"
+    "tests": "tests"
   },
   "author": "Boris Filipov"
 }
