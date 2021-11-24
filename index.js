@@ -105,9 +105,7 @@ module.exports = class Angel {
       return r
     } catch (e) {
       next && next(e)
-      let err = new Error('failed ' + input)
-      err.origin = e
-      throw err
+      throw e
     }
   }
 }
