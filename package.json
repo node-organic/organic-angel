@@ -20,7 +20,7 @@
   "dependencies": {
     "async": "^3.2.2",
     "esm": "^3.2.25",
-    "organic-plasma": "4.1.0"
+    "organic-plasma": "^4.1.1"
   },
   "devDependencies": {
     "jasmine": "3.10.0"

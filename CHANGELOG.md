@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.5.2 - 2021-11-26
+
+### fixed
+
+* angel organic-plasma dep
+
 ## 0.5.1 - 2021-11-24
 
 ### fixed
