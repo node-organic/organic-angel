@@ -38,15 +38,15 @@ module.exports = class Angel {
 
   async loadScript(script, context = this) {
     const m = esm(module)(script)
-    if (m.length === 1) {
-      await m(context)
-    } else {
+    if (m.length === 2) {
       return new Promise((resolve, reject) => {
         m(context, function (err) {
           if (err) return reject(err)
           resolve()
         })
       })
+    } else {
+      await m(context)
     }
   }
 
@@ -66,13 +66,16 @@ module.exports = class Angel {
     return this.reactor.on(pattern, async (cmdData) => {
       const state = this.clone()
       state.cmdData = cmdData
-      if (handler.length === 1) return handler(state)
-      return new Promise((resolve, reject) => {
-        handler(state, function (err, data) {
-          if (err) return reject(err)
-          resolve(data)
+      if (handler.length === 2) {
+        return new Promise((resolve, reject) => {
+          handler(state, function (err, data) {
+            if (err) return reject(err)
+            resolve(data)
+          })
         })
-      })
+      } else {
+        return handler(state)
+      }
     })
   }
 
@@ -80,13 +83,16 @@ module.exports = class Angel {
     return this.reactor.once(pattern, async (cmdData) => {
       const state = this.clone()
       state.cmdData = cmdData
-      if (handler.length === 1) return handler(state)
-      return new Promise((resolve, reject) => {
-        handler(state, function (err, data){
-          if (err) return reject(err)
-          resolve(data)
+      if (handler.length === 2) {
+        return new Promise((resolve, reject) => {
+          handler(state, function (err, data) {
+            if (err) return reject(err)
+            resolve(data)
+          })
         })
-      })
+      } else {
+        return handler(state)
+      }
     })
   }
 

@@ -22,19 +22,24 @@ describe("angel via cli", function(){
     process.chdir(__dirname+"/data")
     var child = exec("node ../../bin/angel.js start chat")
     var state = 0
+    child.stderr.on('data', console.error)
     child.stdout.on("data", function(chunk){
+      chunk = chunk.toString()
       if(state == 0) {
-        expect(chunk.toString()).toBe("> ")
         child.stdin.write("angel.do('script hi', console.log)\n")
         state = 1
+        return
       }
       if(state == 1) {
-        if(chunk.toString() == "> ") return
-        expect(chunk.toString()).toBe('hi')
+        expect(chunk).toContain('hi')
         child.stdin.end()
         state = 2
-        next()
       }
+    })
+    child.on('exit', function (code) {
+      if (code !== 0) return next(new Error('should not happen'))
+      if (state !== 2) return next(new Error('didnt reached hi state'))
+      next()
     })
     child.on("error", next)
   })

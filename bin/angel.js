@@ -31,6 +31,4 @@ fs.exists(angelCellPath, async function(found){
     console.error(err.stack || err)
     return process.exit(1)
   }
-
-  process.exit(0)
 })
