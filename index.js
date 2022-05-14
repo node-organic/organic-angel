@@ -3,6 +3,7 @@ const path = require("path")
 const Plasma = require("organic-plasma")
 const Reactor = require("./lib/reactor")
 const esm = require('esm')
+const resolve = require('resolve/sync')
 
 module.exports = class Angel {
   constructor() {
@@ -24,8 +25,7 @@ module.exports = class Angel {
   async loadDepModules (deps, startingWith, context = this) {
     for (let moduleName in deps) {
       if (moduleName.startsWith(startingWith)) {
-        const script = path.join(this.env.cwd, 'node_modules', moduleName)
-        await this.loadScript(script, context)
+        await this.loadScript(moduleName, context)
       }
     }
   }
@@ -37,7 +37,8 @@ module.exports = class Angel {
   }
 
   async loadScript(script, context = this) {
-    const m = esm(module)(script)
+    const scriptPath = resolve(script, {basedir: this.env.cwd})
+    const m = esm(module)(scriptPath)
     if (m.length === 2) {
       return new Promise((resolve, reject) => {
         m(context, function (err) {

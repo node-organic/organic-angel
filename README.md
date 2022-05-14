@@ -1,4 +1,4 @@
-# organic-angel v0.5.0
+# organic-angel v0.7.0
 
 Angel as concept derrives from `bots`. It can be understood also as `command line assistant`.
 
